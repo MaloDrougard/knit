@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "wheel.h"
+#include "imagedrawer.h"
 
 class ofApp : public ofBaseApp{
 

@@ -12,9 +12,13 @@ Project{
         name: { return FileInfo.baseName(path) }
 
         files: [
+            "src/imagedrawer.cpp",
+            "src/imagedrawer.h",
             "src/main.cpp",
             "src/ofApp.cpp",
             "src/ofApp.h",
+            "src/sged.cpp",
+            "src/sged.h",
             "src/wheel.cpp",
             "src/wheel.h",
         ]

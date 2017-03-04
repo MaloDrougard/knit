@@ -4,15 +4,15 @@
 void ofApp::setup(){
 
 
-    pic.load("/home/makem/Cours/knitProject/inputPics/4px.jpg");
-    pic.setImageType(OF_IMAGE_GRAYSCALE);
+    pic.load("/home/makem/Cours/knitProject/inputPics/640px.jpg");
+    pic.setImageType(OF_IMAGE_COLOR);
 
 
     // crop the image with the bigest square
     int w = pic.getWidth();
     int h = pic.getHeight();
-    int diff = 0;
 
+    int diff = 0;
     if( w > h ){
         diff = w - h;
         pic.crop(diff/2, 0, h, h);
@@ -23,6 +23,26 @@ void ofApp::setup(){
 
     pic.update();
 
+    // We will, always use the index of pixel has coordinate.
+    // Thus, the y axis are incresing in the oposite direction as usual
+
+    ofVec2f centerWheel = ofVec2f( w/2 , w/2 );
+    float radius = (w-1)/2.0 ;    // we want not to be at border but inside
+
+    wheel wel = wheel(16, radius, centerWheel);
+
+    imageDrawer drawer = imageDrawer();
+    drawer.drawPins(pic, wel.pins, wel.pinsNumber);
+
+    list<int * > l = drawer.getPixelIdxOfALine(pic, wel.pins[wel.pinsNumber -1 ], wel.pins[0]);
+    drawer.printListIdx(l);
+
+    for (int i = 0; i < wel.pinsNumber - 1 ; i++){
+       drawer.drawALine(pic, wel.pins[i], wel.pins[i + 1]);
+    }
+    drawer.drawALine(pic, wel.pins[wel.pinsNumber -1 ], wel.pins[0]);
+
+
 }
 
 //--------------------------------------------------------------
@@ -32,40 +52,11 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+
     ofPoint* verts = new ofPoint[5];
-// make a pentagon
-    float size = 500.f;
-    float X1 = 0.125*sqrt(10 + 2*sqrt(5)) * size;
-    float X2 = 0.125*sqrt(10 - 2*sqrt(5)) * size;
-    float Y1 = 0.125*(sqrt(5) - 1) * size;
-    float Y2 = 0.125*(sqrt(5) + 1) * size;
-    verts[0] = ofPoint(0, -0.5 * size);
-    verts[1] = ofPoint(-X1, -Y1);
-    verts[2] = ofPoint(-X2, Y2);
-    verts[3] = ofPoint(X2, Y2);
-    verts[4] = ofPoint(X1, -Y1);
-
-    line.addVertices(verts, 5);
-    line.draw();
 
 
-    pic.draw(200,200);
-
-    ofPoint p1 ;
-    p1.set(-0.5, 3 );
-
-    ofPoint l1;
-    l1.set(-1,1);
-
-    ofPoint l2;
-    l2.set(1,3);
-
-    float t = 90;
-
-    wheel w = wheel(pic);
-
-    ofVec2f pins[8] ;
-    w.generatePins(pins, 8, float (1.0), ofVec2f(1,1) );
+    pic.draw(300,300);
 
 
 

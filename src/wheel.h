@@ -9,17 +9,15 @@ class wheel
 {
 public:
 
-    ofImage img;
-
     int pinsNumber;
-    ofVec2f pins[];
+    float radius;
+    ofVec2f center;
+    ofVec2f* pins; // array name are pointers
 
-    wheel( ofImage img, int pinsNumber = 16 );
 
-    bool isPointOnLine(ofVec2f p1, ofVec2f startLine, ofVec2f endLine, float tolerance);
-    void generatePins(ofVec2f pins[], int pinsSize, float rayon, ofVec2f center);
+    wheel( int pinsNumber=8, float radius=100, ofVec2f center=ofVec2f(0,0) );
 
-    ofImage getImgWithPins();
+    void generatePins();
 
 };
 
