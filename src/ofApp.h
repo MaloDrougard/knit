@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "wheel.h"
 #include "imagedrawer.h"
+#include "shed.h"
 
 class ofApp : public ofBaseApp{
 
@@ -10,6 +11,7 @@ public:
 
     ofPolyline line;
     ofImage pic;
+
 
 
 

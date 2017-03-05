@@ -19,6 +19,10 @@ public:
     list<int *> getPixelIdxOfALine(ofImage &img, ofVec2f l1, ofVec2f l2, float tolerence = 0.5);
 
     void printListIdx(list<int *> l);
+
+    void drawPixels(ofImage &img, list<int *>, ofColor color = ofColor(23,56,77));
+
+    list<int *> getPixelIdxOfALineDDAAlgo(ofImage &img, ofVec2f l1, ofVec2f l2);
 };
 
 #endif // IMAGEDRAWER_H

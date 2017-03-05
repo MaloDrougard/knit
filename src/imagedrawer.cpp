@@ -48,7 +48,7 @@ void imageDrawer::drawALine(ofImage &img, ofVec2f l1, ofVec2f l2, float toleranc
 
 }
 
-
+// return the pixel index of the pixel touch by the line
 list<int *>  imageDrawer::getPixelIdxOfALine(ofImage &img, ofVec2f l1, ofVec2f l2, float tolerance){
 
     list<int *> ret ;
@@ -58,6 +58,7 @@ list<int *>  imageDrawer::getPixelIdxOfALine(ofImage &img, ofVec2f l1, ofVec2f l
 
     ofVec2f tempPoint(0,0);
     int * xy ;
+
 
 
     for(int x = 0 ; x < w; x++){
@@ -76,6 +77,52 @@ list<int *>  imageDrawer::getPixelIdxOfALine(ofImage &img, ofVec2f l1, ofVec2f l
 
     return ret;
 }
+
+
+// return the pixel index of the pixel touch by the line
+list<int *>  imageDrawer::getPixelIdxOfALineDDAAlgo(ofImage &img, ofVec2f l1, ofVec2f l2){
+
+    list<int*> ret;
+    int * xy ;
+
+    int x0 =  static_cast<int> (l1.x);
+    int y0 = static_cast<int> (l1.y);
+
+    int x1 =  static_cast<int> (l2.x);
+    int y1 = static_cast<int> (l2.y);
+
+    int dx = x1 - x0;
+    int dy = y1 - y0;
+
+    int steps = 0;
+    if( abs(dx) > abs(dy) ){
+        steps = abs(dx);
+    } else {
+        steps = abs(dy);
+    }
+
+    float xIncrement = dx / (float) steps;
+    float yIncrement = dy / (float) steps;
+
+   float x = static_cast<float>(x0);
+   float y = static_cast<float>(y0);
+
+   for(int v=0; v < steps; v++)
+    {
+
+       xy = new int[2];
+       xy[0] = static_cast<int>(x);
+       xy[1] = static_cast<int>(y);
+
+       ret.push_back(xy);
+
+       x = x + xIncrement;
+       y = y + yIncrement;
+    }
+
+   return ret;
+}
+
 
 
 void imageDrawer::printListIdx(list<int * > l ){
@@ -118,3 +165,20 @@ void imageDrawer::drawPins(ofImage &img, ofVec2f* pins, int pinsNumber){
 
 
 }
+
+
+void imageDrawer::drawPixels(ofImage &img, list<int * > l, ofColor color)
+{
+
+    for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++){
+
+        img.setColor((*it)[0],  (*it)[1], color);
+    }
+
+    img.update();
+
+
+}
+
+
+
