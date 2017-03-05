@@ -11,6 +11,7 @@ public:
 
     ofPolyline line;
     ofImage pic;
+    ofImage pic2;
 
 
 

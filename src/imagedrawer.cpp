@@ -170,6 +170,7 @@ void imageDrawer::drawPins(ofImage &img, ofVec2f* pins, int pinsNumber){
 void imageDrawer::drawPixels(ofImage &img, list<int * > l, ofColor color)
 {
 
+
     for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++){
 
         img.setColor((*it)[0],  (*it)[1], color);
@@ -177,8 +178,40 @@ void imageDrawer::drawPixels(ofImage &img, list<int * > l, ofColor color)
 
     img.update();
 
+}
+
+
+
+void imageDrawer::incrementPixels(ofImage &img, list<int * > l, ofColor color)
+{
+
+    for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++){
+
+        color = img.getColor((*it)[0],  (*it)[1]);
+        color = color + color;
+        img.setColor((*it)[0],  (*it)[1], color);
+    }
+
+    img.update();
 
 }
+
+
+
+
+void imageDrawer::decreasePixels(ofImage &img, list<int * > l, ofColor color)
+{
+    for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++){
+
+        color = img.getColor((*it)[0],  (*it)[1]);
+        color = color - color;
+        img.setColor((*it)[0],  (*it)[1], color);
+    }
+
+    img.update();
+
+}
+
 
 
 
