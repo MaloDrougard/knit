@@ -113,6 +113,7 @@ void shed::checkchange(){
     if(numberPinsP != wel.pinsNumber){
         destroyLine();
         setWheel();
+        setSketch();
         initializeLines();
         computeStringPath();
         drawString();
@@ -120,12 +121,14 @@ void shed::checkchange(){
 
     if(numberStringReal != numberStringP){
         numberStringReal = numberStringP;
+        setSketch();
         computeStringPath();
         drawString();
     }
 
     if(algoOpacityReal != algoOpacityP){
         algoOpacityReal = algoOpacityP;
+        setSketch();
         computeStringPath();
         drawString();
     }
