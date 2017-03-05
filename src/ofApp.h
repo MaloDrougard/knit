@@ -5,15 +5,17 @@
 #include "imagedrawer.h"
 #include "shed.h"
 
+#include "ofxGui.h"
+
 class ofApp : public ofBaseApp{
 
 public:
 
-    ofPolyline line;
+
     ofImage pic;
-    ofImage pic2;
+    shed * workshop;
 
-
+    ofxPanel gui;
 
 
     void setup();

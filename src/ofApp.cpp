@@ -7,13 +7,12 @@ void ofApp::setup(){
     pic.load("/home/makem/Cours/knitProject/inputPics/MMM-highcontrast.jpg");
     pic.setImageType(OF_IMAGE_COLOR);
 
-    shed work = shed(pic);
+    workshop = new shed(pic);
 
-    work.computeStringPath();
-    work.drawString();
+    workshop->computeStringPath();
+    workshop->drawString();
 
-    pic = work.result;
-    pic2 = work.originalImg;
+    gui.setup(workshop->shedParameter);
 
 
 
@@ -27,15 +26,12 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
-    ofPoint* verts = new ofPoint[5];
+    workshop->checkchange();
 
+    workshop->originalImg.draw(50,50);
+    workshop->result.draw(749, 50);
 
-    pic.draw(50,50);
-    pic2.draw(749, 50);
-
-
-
-
+    gui.draw();
 
 }
 

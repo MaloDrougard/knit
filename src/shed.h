@@ -12,12 +12,22 @@ public:
     ofImage sketchImg;
     ofImage result;
 
+
+    ofParameterGroup shedParameter;
+    ofParameter<int> numberStringP;
+    ofParameter<int> numberPinsP;
+    ofParameter<int> algoOpacityP;
+    ofParameter<int> drawOpacityP;
+
+    int drawOpacityReal;
+    int algoOpacityReal;
+    int numberStringReal;
+
+
     wheel wel;
     imageDrawer drawer;
 
     list<int*> ** lines;
-
-    int numberString;
     list<int> stringPath;
 
     shed(ofImage oriImg);
@@ -34,6 +44,14 @@ public:
     void drawString();
 
     void decreaseDarkness(list<int *> l, float decreasingV);
+
+    void setupParameter();
+
+    void checkchange();
+    void initializeLines();
+    void setWheel();
+    void setSketch();
+    void destroyLine();
 };
 
 #endif // SHED_H

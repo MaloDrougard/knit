@@ -1,8 +1,27 @@
 #include "shed.h"
 
+
 shed::shed(ofImage oriImg)
 {
+    setupParameter();
+
     originalImg = oriImg;
+
+    // initialize the sketch image who is use to perform the computation
+    setSketch();
+
+    // initialize drawer, it's a utility tool to access image
+    drawer = imageDrawer();
+
+    // set wheel that contains pins position
+    setWheel();
+
+    // set lines who represent all the strings possibilities betweens pins
+    initializeLines();
+
+}
+
+void shed::setSketch(){
 
     int w = originalImg.getWidth();
     int h = originalImg.getHeight();
@@ -18,20 +37,22 @@ shed::shed(ofImage oriImg)
         sketchImg.crop(0, diff/2,  w, w);
     }
 
-    originalImg.update();
+    sketchImg.update();
+}
 
-    // We will, always use the index of pixel has coordinate.
-    // Thus, the y axis are incresing in the oposite direction as usual
+void shed::setWheel(){
+    int w = sketchImg.getWidth();
+    int h = sketchImg.getHeight();
+
 
     ofVec2f centerWheel = ofVec2f( w/2 , w/2 );
     float radius = (w-1)/2.0 ;    // we want not to be at border but inside
 
-    wel = wheel(360, radius, centerWheel);
+    wel = wheel(numberPinsP, radius, centerWheel);
+}
 
-    numberString = 2800;
 
-    drawer = imageDrawer();
-
+void shed::initializeLines(){
     // initializing lines
     lines = new list<int * > * [wel.pinsNumber];
     for (int i = 0; i < wel.pinsNumber; i++) {
@@ -40,7 +61,7 @@ shed::shed(ofImage oriImg)
 
     for(int i = 0; i < wel.pinsNumber; i ++ ){
         for(int j = 0; j < wel.pinsNumber; j++){
-            
+
             if ( i != j){
                 lines[i][j] = drawer.getPixelIdxOfALineDDAAlgo(sketchImg, wel.pins[i], wel.pins[j]);
             } else {
@@ -50,7 +71,69 @@ shed::shed(ofImage oriImg)
         }
 
     }
+}
 
+void shed::destroyLine(){
+
+    // FIXME
+
+    for( int x = 0; x < wel.pinsNumber; x++)
+    {
+        for( int y= 0; y < wel.pinsNumber; y++){
+            list<int * > l = lines[x][y];
+            for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++){
+                delete [] *it;
+            }
+        }
+    }
+
+    for (int i = 0; i < wel.pinsNumber; i++ ){ // is it correct ? needed?
+         delete [] lines[i] ;
+    }
+    delete [] lines;
+
+}
+
+
+
+void shed::setupParameter(){
+
+    shedParameter.setName("Parameters");
+    shedParameter.add(numberStringP.set("#strings",600, 0, 20000));
+    shedParameter.add(numberPinsP.set("#pins",120, 4, 1200));
+    shedParameter.add(algoOpacityP.set("algo opacity",25,0,255));
+    shedParameter.add(drawOpacityP.set("draw opacity",25,0,255));
+
+    numberStringReal = numberStringP;
+    algoOpacityReal = algoOpacityP;
+}
+
+void shed::checkchange(){
+
+    if(numberPinsP != wel.pinsNumber){
+        destroyLine();
+        setWheel();
+        initializeLines();
+        computeStringPath();
+        drawString();
+    }
+
+    if(numberStringReal != numberStringP){
+        numberStringReal = numberStringP;
+        computeStringPath();
+        drawString();
+    }
+
+    if(algoOpacityReal != algoOpacityP){
+        algoOpacityReal = algoOpacityP;
+        computeStringPath();
+        drawString();
+    }
+
+    if(drawOpacityReal != drawOpacityP){
+        drawOpacityReal = drawOpacityP;
+        drawString();
+    }
 
 
 }
@@ -96,7 +179,6 @@ float shed::lineScore( list<int*> l){
     {
         color = sketchImg.getColor( (*it)[0], (*it)[1] );
         lightness = color.getLightness();
-
         score =  score   + (color.limit() - lightness) ;  // 255 lightness is white
         numberOfPixel = numberOfPixel + 1;
 
@@ -136,7 +218,6 @@ int shed::findNextBestPin(int pinIdx){
 void shed::decreaseDarkness(list<int*> l, float decreasingV) {
 
     ofColor color(decreasingV,decreasingV,decreasingV);
-
     drawer.incrementPixels(sketchImg, l, color);
 
     sketchImg.update();
@@ -146,7 +227,7 @@ void shed::decreaseDarkness(list<int*> l, float decreasingV) {
 
 void shed::computeStringPath(){
 
-    float decreaseV = 25;
+    float decreaseV = algoOpacityReal;
 
     stringPath.clear();
     stringPath.push_back(0);
@@ -154,7 +235,7 @@ void shed::computeStringPath(){
     int currentPinIdx = 0;
     int nextPinIdx = -1;
 
-    for( int i = 0 ; i< numberString; i++ ){
+    for( int i = 0 ; i< numberStringReal; i++ ){
         nextPinIdx = findNextBestPin(currentPinIdx);
         // decrease the value of the pixel that are under the line
 
@@ -172,13 +253,14 @@ void shed::drawString(){
     result.allocate(sketchImg.getWidth(), sketchImg.getHeight(), OF_IMAGE_COLOR);
     result.setColor(ofColor::white);
 
+    int opacity = drawOpacityReal;
 
     std::list<int>::iterator next_it = stringPath.begin();
     next_it++;
 
     for (std::list<int>::iterator it = stringPath.begin();  next_it  != stringPath.end()  ; it++)
     {
-        drawer.decreasePixels(result, lines[*it][*next_it], ofColor(25,25,25));
+        drawer.decreasePixels(result, lines[*it][*next_it], ofColor(opacity,opacity,opacity));
         next_it++;
 
     }
