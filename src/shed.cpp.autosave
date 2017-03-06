@@ -100,9 +100,9 @@ void shed::setupParameter(){
 
     shedParameter.setName("Parameters");
     shedParameter.add(numberStringP.set("#strings",2000, 0, 20000));
-    shedParameter.add(numberPinsP.set("#pins",450, 4, 1200));
+    shedParameter.add(numberPinsP.set("#pins",170, 4, 1200));
     shedParameter.add(algoOpacityP.set("algo opacity",56,0,255));
-    shedParameter.add(drawOpacityP.set("draw opacity",9,0,255));
+    shedParameter.add(drawOpacityP.set("draw opacity",,0,255));
 
     numberStringReal = numberStringP;
     algoOpacityReal = algoOpacityP;
