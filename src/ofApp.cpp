@@ -4,17 +4,14 @@
 void ofApp::setup(){
 
 
-    pic.load("/home/makem/Cours/knitProject/inputPics/MMM-highcontrast.jpg");
+    pic.load("/home/makem/Cours/knitProject/inputPics/esteva-cafe.jpg");
     pic.setImageType(OF_IMAGE_COLOR);
 
     workshop = new shed(pic);
 
-    workshop->computeStringPath();
-    workshop->drawString();
+    numberOfCall = 0;
 
     gui.setup(workshop->shedParameter);
-
-
 
 }
 
@@ -26,13 +23,16 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
-    workshop->checkchange();
+    // workshop->checkchange();
+    
+    std::cout << "call to drawOne number: " <<  numberOfCall << std::endl;
+    workshop->computeNextPinAndDrawOneString();
 
-    workshop->originalImg.draw(50,50);
-    workshop->result.draw(749, 50);
-
+    workshop->originalImg.draw(0,0);
+    workshop->result.draw(720, 0);
     gui.draw();
 
+    numberOfCall++;
 }
 
 //--------------------------------------------------------------

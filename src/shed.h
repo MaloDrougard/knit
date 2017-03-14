@@ -3,6 +3,7 @@
 
 #include "wheel.h"
 #include "imagedrawer.h"
+#include <climits>
 
 class shed
 {
@@ -19,9 +20,17 @@ public:
     ofParameter<int> algoOpacityP;
     ofParameter<int> drawOpacityP;
 
+    ofParameter<bool> startIncrementationP;
+    ofParameter<bool> stopIncrementationP;
+
+
+
     int drawOpacityReal;
     int algoOpacityReal;
     int numberStringReal;
+
+
+
 
 
     wheel wel;
@@ -39,6 +48,8 @@ public:
 
     int findNextBestPin(int pinIdx);
 
+
+
     void computeStringPath();
 
     void drawString();
@@ -50,8 +61,22 @@ public:
     void checkchange();
     void initializeLines();
     void setWheel();
+
     void setSketch();
+    void setEmptyResult();
+
     void destroyLine();
+
+
+    float lineWeightScore(list<int *> l);
+
+
+    void computeNextPinAndDrawOneString();
+    int currentPinIdx1; // used in computeNextPinAndDrawOneString()
+    int nextPinIdx1; // used in computeNextPinAndDrawOneString()
+
+
 };
+
 
 #endif // SHED_H

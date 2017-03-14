@@ -19,6 +19,11 @@ shed::shed(ofImage oriImg)
     // set lines who represent all the strings possibilities betweens pins
     initializeLines();
 
+
+    setEmptyResult();
+    currentPinIdx1 = 0;
+    nextPinIdx1 = -1;
+
 }
 
 void shed::setSketch(){
@@ -40,6 +45,13 @@ void shed::setSketch(){
     sketchImg.update();
 }
 
+void shed::setEmptyResult(){
+
+    result.allocate(sketchImg.getWidth(), sketchImg.getHeight(), OF_IMAGE_COLOR);
+    result.setColor(ofColor::white);
+
+}
+
 void shed::setWheel(){
     int w = sketchImg.getWidth();
     int h = sketchImg.getHeight();
@@ -53,8 +65,9 @@ void shed::setWheel(){
 
 
 void shed::initializeLines(){
+
     // initializing lines
-    lines = new list<int * > * [wel.pinsNumber];
+    lines = new list<int*> * [wel.pinsNumber];
     for (int i = 0; i < wel.pinsNumber; i++) {
         lines[i] = new list<int*> [wel.pinsNumber];
     }
@@ -75,15 +88,22 @@ void shed::initializeLines(){
 
 void shed::destroyLine(){
 
+
+    int * temp;
     // FIXME
 
     for( int x = 0; x < wel.pinsNumber; x++)
     {
         for( int y= 0; y < wel.pinsNumber; y++){
             list<int * > l = lines[x][y];
-            for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++){
-                delete [] *it;
+
+            while (! l.empty()) {
+                temp = l.front();
+                delete [] temp;
+                l.pop_front();
+
             }
+
         }
     }
 
@@ -99,10 +119,13 @@ void shed::destroyLine(){
 void shed::setupParameter(){
 
     shedParameter.setName("Parameters");
-    shedParameter.add(numberStringP.set("#strings",2000, 0, 20000));
-    shedParameter.add(numberPinsP.set("#pins",450, 4, 1200));
+    shedParameter.add(numberStringP.set("#strings",16000, 0, 20000));
+    shedParameter.add(numberPinsP.set("#pins",300, 4, 1200));
     shedParameter.add(algoOpacityP.set("algo opacity",56,0,255));
-    shedParameter.add(drawOpacityP.set("draw opacity",9,0,255));
+    shedParameter.add(drawOpacityP.set("draw opacity",36,0,255));
+
+    shedParameter.add(stopIncrementationP.set("stop drawing", false));
+
 
     numberStringReal = numberStringP;
     algoOpacityReal = algoOpacityP;
@@ -194,9 +217,65 @@ float shed::lineScore( list<int*> l){
 }
 
 
-int shed::findNextBestPin(int pinIdx){
 
-    float bestScore = 0;
+
+float shed::lineWeightScore(list<int*> l){
+    // wheigt the importance of pixel  relativly to the center
+
+    ofColor color;
+    float lightness;
+
+    int numberOfPixel = 0;
+    float score = 0;
+
+    int w = sketchImg.getWidth();
+    int h = sketchImg.getHeight();
+    float diagonal = sqrt(pow(w/2.0, 2) + pow(h/2.0, 2)); // should be the max norm
+
+    float dx = -1;
+    float dy = -1;
+    float norm = -1;
+    float factor = -1;
+
+
+
+    for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++)
+    {
+        color = sketchImg.getColor( (*it)[0], (*it)[1] );
+        // get deltas of center
+        dx = (*it)[0] - (w/2.0) ;
+        dy = (*it)[1] - (w/2.0);
+        // compute norm from the center to the pixel position
+        norm = sqrt(pow(dx, 2) + pow(dy, 2));
+        factor = diagonal - norm;
+        // compute the standard score from lightness
+        lightness = color.getLightness();
+        score =  score   + factor * (color.limit() - lightness) ;  //  weight the score
+
+        numberOfPixel = numberOfPixel + 1;
+
+    }
+
+    score = score / (float) numberOfPixel; // to not advantage long line
+
+    return score;
+
+
+
+}
+
+
+
+
+
+
+
+int shed::findNextBestPin(int pinIdx){
+// go through all the pins and determine the next best one
+// the Score function only need to be positive monotone
+
+
+    float bestScore = INT_MIN;
     float tempScore = 0;
 
     int bestNextIdx = 0;
@@ -206,6 +285,7 @@ int shed::findNextBestPin(int pinIdx){
     for( int i = 0; i < wel.pinsNumber; i++){
         tempIdx = ( i + pinIdx) % wel.pinsNumber;
         tempScore = lineScore(lines[pinIdx][tempIdx]);
+
 
         if (tempScore > bestScore){
             bestScore = tempScore;
@@ -272,10 +352,35 @@ void shed::drawString(){
 
 
 
+void shed::computeNextPinAndDrawOneString(){
 
 
+    std::cout << "  we are inside drawOne "<< std::endl;
+    if (! stopIncrementationP){
 
 
+        std::cout << "      we are computing in drawOne "<< std::endl;
+
+        float decreaseV = algoOpacityP;
+        int opacity = drawOpacityP;
+
+
+        nextPinIdx1 = findNextBestPin(currentPinIdx1);
+
+        // decrease the value of the pixel that are under the line
+        decreaseDarkness(lines[currentPinIdx1][nextPinIdx1], decreaseV);
+
+        // draw the line
+        drawer.decreasePixels(result, lines[currentPinIdx1][nextPinIdx1], ofColor(opacity,opacity,opacity));
+
+        // update the pin
+        currentPinIdx1 = nextPinIdx1;
+
+
+    }
+
+
+}
 
 
 

@@ -14,6 +14,7 @@ public:
 
     ofImage pic;
     shed * workshop;
+    int numberOfCall;
 
     ofxPanel gui;
 
