@@ -118,9 +118,9 @@ void shed::destroyLine(){
 
 void shed::setupParameter(){
 
-    shedParameter.setName("Parameters");
-    shedParameter.add(numberStringP.set("#strings",16000, 0, 20000));
-    shedParameter.add(numberPinsP.set("#pins",300, 4, 1200));
+    shedParameter.setName("Shed Parameters");
+    shedParameter.add(numberStringP.set("#strings",0, 0, 20000));
+    shedParameter.add(numberPinsP.set("#pins",360, 4, 1200));
     shedParameter.add(algoOpacityP.set("algo opacity",56,0,255));
     shedParameter.add(drawOpacityP.set("draw opacity",36,0,255));
 
@@ -359,8 +359,6 @@ void shed::computeNextPinAndDrawOneString(){
     if (! stopIncrementationP){
 
 
-        std::cout << "      we are computing in drawOne "<< std::endl;
-
         float decreaseV = algoOpacityP;
         int opacity = drawOpacityP;
 
@@ -373,6 +371,12 @@ void shed::computeNextPinAndDrawOneString(){
         // draw the line
         drawer.decreasePixels(result, lines[currentPinIdx1][nextPinIdx1], ofColor(opacity,opacity,opacity));
 
+
+
+        std::cout << "      we are computing in drawOne.    currentPin: "<<  currentPinIdx1 << ", nextPin: " << nextPinIdx1 << std::endl;
+
+        numberStringP++;
+
         // update the pin
         currentPinIdx1 = nextPinIdx1;
 
@@ -381,6 +385,42 @@ void shed::computeNextPinAndDrawOneString(){
 
 
 }
+
+
+void shed::randomifyNextPinAndDrawOneString(){
+
+
+    std::cout << "  we are inside drawOne "<< std::endl;
+    if (! stopIncrementationP){
+
+        float decreaseV = algoOpacityP;
+        int opacity = drawOpacityP;
+
+
+        nextPinIdx1 = rand() % numberPinsP ;
+
+        // decrease the value of the pixel that are under the line
+        decreaseDarkness(lines[currentPinIdx1][nextPinIdx1], decreaseV);
+
+        // draw the line
+        drawer.decreasePixels(result, lines[currentPinIdx1][nextPinIdx1], ofColor(opacity,opacity,opacity));
+
+
+
+        std::cout << "      we are computing in drawOne.    currentPin: "<<  currentPinIdx1 << ", nextPin: " << nextPinIdx1 << std::endl;
+
+        numberStringP++;
+
+        // update the pin
+        currentPinIdx1 = nextPinIdx1;
+
+
+    }
+
+
+}
+
+
 
 
 

@@ -76,6 +76,7 @@ public:
     int nextPinIdx1; // used in computeNextPinAndDrawOneString()
 
 
+    void randomifyNextPinAndDrawOneString();
 };
 
 

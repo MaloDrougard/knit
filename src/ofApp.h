@@ -11,12 +11,16 @@ class ofApp : public ofBaseApp{
 
 public:
 
+    ofParameterGroup allParameters;
+    ofParameter<bool> oneRandom ;
 
     ofImage pic;
     shed * workshop;
     int numberOfCall;
 
     ofxPanel gui;
+
+
 
 
     void setup();
