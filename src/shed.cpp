@@ -7,8 +7,18 @@ shed::shed(ofImage oriImg)
 
     originalImg = oriImg;
 
+
+
+
     // initialize the sketch image who is use to perform the computation
     setSketch();
+
+    w = sketchImg.getWidth();
+    h = sketchImg.getHeight();
+
+    initializeMask();
+    setDisplayImg();
+
 
     // initialize drawer, it's a utility tool to access image
     drawer = imageDrawer();
@@ -47,15 +57,47 @@ void shed::setSketch(){
 
 void shed::setEmptyResult(){
 
-    result.allocate(sketchImg.getWidth(), sketchImg.getHeight(), OF_IMAGE_COLOR);
+    result.allocate(w, h , OF_IMAGE_COLOR);
     result.setColor(ofColor::white);
 
 }
 
-void shed::setWheel(){
-    int w = sketchImg.getWidth();
-    int h = sketchImg.getHeight();
+void shed::setDisplayImg()
+{
 
+    displayImg.clone(originalImg);
+
+    int diff = 0;
+    if( w > h ){
+        diff = w - h;
+        displayImg.crop(diff/2, 0, h, h);
+    } else {
+        diff = h - w;
+        displayImg.crop(0, diff/2,  w, w);
+    }
+
+    displayImg.update();
+
+}
+
+void shed::initializeMask()
+{
+
+    mask = new float * [w];
+
+    for (int i = 0 ; i < w; i++){
+        mask[i] = new float [h];
+    }
+
+    for (int x = 0; x < w; x++){
+        for(int y = 0; y < h; y++){
+            mask[x][y] = 0;
+        }
+    }
+
+}
+
+void shed::setWheel(){
 
     ofVec2f centerWheel = ofVec2f( w/2 , w/2 );
     float radius = (w-1)/2.0 ;    // we want not to be at border but inside
@@ -120,7 +162,7 @@ void shed::setupParameter(){
 
     shedParameter.setName("Shed Parameters");
     shedParameter.add(numberStringP.set("#strings",0, 0, 20000));
-    shedParameter.add(numberPinsP.set("#pins",360, 4, 1200));
+    shedParameter.add(numberPinsP.set("#pins",80, 4, 1200));
     shedParameter.add(algoOpacityP.set("algo opacity",56,0,255));
     shedParameter.add(drawOpacityP.set("draw opacity",36,0,255));
 
@@ -176,17 +218,7 @@ shed::~shed(){
 void shed::trying()
 {
 
-    for (int i = 0; i < wel.pinsNumber; i++ ){
 
-            drawer.drawPixels(sketchImg, lines[i][3]);
-
-    }
-
-    for (int i = 0; i < wel.pinsNumber; i++ ){
-
-            drawer.drawPixels(sketchImg, lines[i][207]);
-
-    }
 
 }
 
@@ -354,8 +386,6 @@ void shed::drawString(){
 
 void shed::computeNextPinAndDrawOneString(){
 
-
-    std::cout << "  we are inside drawOne "<< std::endl;
     if (! stopIncrementationP){
 
 
@@ -370,10 +400,6 @@ void shed::computeNextPinAndDrawOneString(){
 
         // draw the line
         drawer.decreasePixels(result, lines[currentPinIdx1][nextPinIdx1], ofColor(opacity,opacity,opacity));
-
-
-
-        std::cout << "      we are computing in drawOne.    currentPin: "<<  currentPinIdx1 << ", nextPin: " << nextPinIdx1 << std::endl;
 
         numberStringP++;
 
@@ -420,9 +446,69 @@ void shed::randomifyNextPinAndDrawOneString(){
 
 }
 
+/*
+ * Go through a the display image and set the original image if there is no preference factor at these position
+*/
+void shed::computeLeftDisplayImg()
+{
+
+    setDisplayImg();
+
+    ofColor color = ofColor::lavender;
+
+    for( int x = 0 ; x < displayImg.getWidth(); x++ ){
+        for ( int y = 0; y < displayImg.getHeight(); y++ ){
+            if (mask[x][y] != 0) {
+               displayImg.setColor(x,y, color);
+            }
+
+        }
+    }
+
+    displayImg.update();
+
+
+}
+
+/*
+ *  Draw on mask using the brush given in parameter
+ * The brush type must be of the form float **
+ *
+ * example you can give an array like this:
+ *
+ *  0 1 0   or  1 1
+ *  1 1 1       0 3
+ *  0 1 0
+ *
+ *
+ *
+*/
+void shed::brushMask( int x, int y ,float ** brushType, int sizeBrush){
+
+    int tempIdxX = 0;
+    int tempIdxY = 0;
+
+    if ((x > w -1 ) or (y > h -1) or (x < 0) or (y < 0)){
+        std::cout << "brush mask must be call for pixel inside the sketch image" << std::endl;
+        throw 20;
+    }
+
+    int middle = sizeBrush / 2;
+
+    for( int i = 0; i < sizeBrush; i++ ){
+        for( int j = 0; j < sizeBrush; j++ ){
+            tempIdxX = x - middle + i;
+            tempIdxY = y - middle + j;
+            if  (!( (tempIdxX < 0) or (tempIdxX > w -1 ) or (tempIdxY < 0 ) or (tempIdxY > h -1 ) ) ) { // border case of the brush
+                mask[tempIdxX][tempIdxY] += brushType[i][j];
+            }
+         }
+
+    }
 
 
 
+}
 
 
 

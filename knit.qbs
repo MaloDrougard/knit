@@ -21,6 +21,8 @@ Project{
             "src/shed.h",
             "src/wheel.cpp",
             "src/wheel.h",
+            "src/zone.cpp",
+            "src/zone.h",
         ]
 
         of.addons: [

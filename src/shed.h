@@ -9,9 +9,15 @@ class shed
 {
 public:
 
+    int w ; // width of the image we use
+    int h ; // height of the image we use
+
     ofImage originalImg;
     ofImage sketchImg;
     ofImage result;
+    ofImage displayImg; // image use for the left diplay
+
+    float ** mask;  // mask of the preference factor
 
 
     ofParameterGroup shedParameter;
@@ -64,6 +70,9 @@ public:
 
     void setSketch();
     void setEmptyResult();
+    void setDisplayImg();
+
+    void initializeMask();
 
     void destroyLine();
 
@@ -77,6 +86,10 @@ public:
 
 
     void randomifyNextPinAndDrawOneString();
+
+    void computeLeftDisplayImg();
+
+    void brushMask(int x, int y, float ** brushType, int sizeBrush);
 };
 
 

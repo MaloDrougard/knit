@@ -156,8 +156,8 @@ void imageDrawer::drawPins(ofImage &img, ofVec2f* pins, int pinsNumber){
        img.setColor( x, y , color);
        img.setColor( x + 1, y , color);
        img.setColor( x, y + 1 , color);
-       img.setColor( x -1,  y , color);
-       img.setColor( x, y -1 , color);
+       img.setColor( x - 1,  y , color);
+       img.setColor( x, y - 1 , color);
 
     }
 

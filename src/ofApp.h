@@ -4,6 +4,7 @@
 #include "wheel.h"
 #include "imagedrawer.h"
 #include "shed.h"
+#include "zone.h"
 
 #include "ofxGui.h"
 
@@ -19,6 +20,13 @@ public:
     int numberOfCall;
 
     ofxPanel gui;
+
+    zone zoneA;
+    zone zoneB;
+
+    float ** brush ;
+    int brushSize ;
+
 
 
 
@@ -39,4 +47,7 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
 
+    void setupBrush();
+
+    void onMouseInZoneA(ofVec2f &relPos);
 };
