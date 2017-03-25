@@ -16,6 +16,7 @@ public:
     ofImage sketchImg;
     ofImage result;
     ofImage displayImg; // image use for the left diplay
+    ofImage gridImg; //
 
     float ** mask;  // mask of the preference factor
 
@@ -48,7 +49,6 @@ public:
     shed(ofImage oriImg);
     ~shed();
 
-    void trying();
 
     float lineScore(list<int *> l);
 
@@ -70,14 +70,14 @@ public:
 
     void setSketch();
     void setEmptyResult();
+    void setEmptyGridImg();
+
     void setDisplayImg();
 
     void initializeMask();
 
     void destroyLine();
 
-
-    float lineWeightScore(list<int *> l);
 
 
     void computeNextPinAndDrawOneString();
@@ -95,7 +95,7 @@ public:
     float lineScoreWeighByMaskFactorCumulative(list<int *> l);
     float lineScoreDelta(list<int *> l);
 
-    ofImage displayGrid();
+    void setGrid();
 
 };
 

@@ -24,6 +24,8 @@ public:
     zone zoneA;
     zone zoneB;
 
+    zone buttonA;
+
     float ** brush ;
     int brushSize ;
 
@@ -50,4 +52,5 @@ public:
     void setupBrush();
 
     void onMouseInZoneA(ofVec2f &relPos);
+    void onMousePressedOnButtonA(ofVec2f &relPos);
 };

@@ -31,6 +31,8 @@ shed::shed(ofImage oriImg)
 
 
     setEmptyResult();
+    setEmptyGridImg();
+
     currentPinIdx1 = 0;
     nextPinIdx1 = -1;
 
@@ -59,6 +61,14 @@ void shed::setEmptyResult(){
 
     result.allocate(w, h , OF_IMAGE_COLOR);
     result.setColor(ofColor::white);
+    gridImg.update();
+}
+
+void shed::setEmptyGridImg()
+{
+    gridImg.allocate(w, h , OF_IMAGE_COLOR);
+    gridImg.setColor(ofColor::white);
+    gridImg.update();
 
 }
 
@@ -159,7 +169,7 @@ void shed::setupParameter(){
 
     shedParameter.setName("Shed Parameters");
     shedParameter.add(numberStringP.set("#strings",0, 0, 20000));
-    shedParameter.add(numberPinsP.set("#pins",380, 4, 1200));
+    shedParameter.add(numberPinsP.set("#pins",500, 4, 1200));
     shedParameter.add(algoOpacityP.set("algo opacity",56,0,255));
     shedParameter.add(drawOpacityP.set("draw opacity",36,0,255));
 
@@ -291,6 +301,7 @@ float shed::lineScoreDelta( list<int*> l){
     return score;
 
 }
+
 
 
 // return the lightness score adaptation of the pixel contain in l
@@ -564,14 +575,21 @@ void shed::brushMask( int x, int y ,float ** brushType, int sizeBrush){
 
 }
 
-
-ofImage shed::displayGrid()
+void shed::setGrid()
 {
 
-    ofImage ret;
+    list<int *> l;
 
 
+    for(int i = 0; i < wel.pinsNumber; i ++ ){
+        for(int j = 0; j < wel.pinsNumber; j++){
 
+            l = lines[i][j];
+            drawer.decreasePixels(gridImg, l, ofColor(2,2,2));
+        }
+    }
+
+    gridImg.update();
 
 }
 

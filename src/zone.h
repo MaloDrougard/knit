@@ -17,6 +17,7 @@ public:
 
 
     ofEvent<ofVec2f> dragInside; // fire the coordinate relativily to this zone
+    ofEvent<ofVec2f> mousePressedInside; // fire the coordinate relativily to this zone
 
     int w;
     int h;
@@ -25,6 +26,8 @@ public:
 
     int relativeX;
     int relativeY;
+
+    ofColor bgColor;
 
 
     //We need to declare all this mouse events methods to be able to listen to mouse events.
@@ -48,6 +51,11 @@ public:
 
 
     ~zone();
+
+
+    void drawBackground();
+    void drawBackground(ofColor color);
+
 
 
 protected:
