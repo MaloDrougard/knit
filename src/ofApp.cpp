@@ -4,7 +4,7 @@
 void ofApp::setup(){
 
 
-    pic.load("/home/makem/Cours/knitProject/inputPics/MMM-highcontrast.jpg");
+    pic.load("/home/makem/Cours/knitProject/inputPics/el-greco-bart-face-1.jpg");
     pic.setImageType(OF_IMAGE_COLOR);
 
     workshop = new shed(pic);
@@ -37,9 +37,9 @@ void ofApp::setup(){
 
 
 
-
-
 }
+
+
 
 
 void ofApp::setupBrush()
@@ -52,7 +52,7 @@ void ofApp::setupBrush()
 
     for (int j = 0; j < brushSize; j++ ){
         for (int h = 0; h < brushSize; h++ ){
-            brush[j][h] = 1;
+            brush[j][h] = 6;
         }
     }
 }
@@ -82,7 +82,8 @@ void ofApp::draw(){
     }
 
     workshop->computeLeftDisplayImg();
-    zoneA.drawImageInZone(workshop->displayImg);
+    workshop->sketchImg.update();
+    zoneA.drawImageInZone(workshop->sketchImg);
     zoneB.drawImageInZone(workshop->result);
 
 

@@ -91,7 +91,7 @@ void shed::initializeMask()
 
     for (int x = 0; x < w; x++){
         for(int y = 0; y < h; y++){
-            mask[x][y] = 0;
+            mask[x][y] = 1;
         }
     }
 
@@ -104,7 +104,6 @@ void shed::setWheel(){
 
     wel = wheel(numberPinsP, radius, centerWheel);
 }
-
 
 void shed::initializeLines(){
 
@@ -156,13 +155,11 @@ void shed::destroyLine(){
 
 }
 
-
-
 void shed::setupParameter(){
 
     shedParameter.setName("Shed Parameters");
     shedParameter.add(numberStringP.set("#strings",0, 0, 20000));
-    shedParameter.add(numberPinsP.set("#pins",80, 4, 1200));
+    shedParameter.add(numberPinsP.set("#pins",380, 4, 1200));
     shedParameter.add(algoOpacityP.set("algo opacity",56,0,255));
     shedParameter.add(drawOpacityP.set("draw opacity",36,0,255));
 
@@ -172,6 +169,18 @@ void shed::setupParameter(){
     numberStringReal = numberStringP;
     algoOpacityReal = algoOpacityP;
 }
+
+
+shed::~shed(){
+
+    for (int i = 0; i < wel.pinsNumber; i++ ){ // is it correct ? needed?
+         delete [] lines[i] ;
+    }
+    delete [] lines;
+
+}
+
+
 
 void shed::checkchange(){
 
@@ -206,22 +215,18 @@ void shed::checkchange(){
 
 }
 
-shed::~shed(){
-
-    for (int i = 0; i < wel.pinsNumber; i++ ){ // is it correct ? needed?
-         delete [] lines[i] ;
-    }
-    delete [] lines;
-
-}
-
-void shed::trying()
-{
 
 
+
+// decrease the lightness of the pixel who index are contain in l
+void shed::decreaseDarkness(list<int*> l, float decreasingV) {
+
+    ofColor color(decreasingV,decreasingV,decreasingV);
+    drawer.incrementPixels(sketchImg, l, color);
+
+    sketchImg.update();
 
 }
-
 
 
 // return the lightness score adaptation of the pixel contain in l
@@ -248,42 +253,67 @@ float shed::lineScore( list<int*> l){
 
 }
 
+float shed::lineScoreDelta( list<int*> l){
+
+    ofColor color1;
+    ofColor color2;
+
+    float lightness1;
+    float lightness2;
 
 
+    int numberOfPixel = 0;
+    float score = 0;
 
-float shed::lineWeightScore(list<int*> l){
-    // wheigt the importance of pixel  relativly to the center
+    float scoreTemp = 0;
+
+    std::list<int * >::iterator next_it = l.begin();
+    next_it++;
+
+    for (std::list<int * >::iterator it = l.begin(); next_it != l.end(); it++)
+    {
+        color1 = sketchImg.getColor( (*it)[0], (*it)[1] );
+        lightness1 = color1.getLightness();
+
+        color2 = sketchImg.getColor( (*next_it)[0], (*next_it)[1] );
+        lightness2 = color2.getLightness();
+
+        scoreTemp =  color1.limit() - abs(lightness1 - lightness2) ;  // 255 lightness is white
+        score += scoreTemp;
+
+        numberOfPixel = numberOfPixel + 1;
+        next_it++;
+
+    }
+
+    score = score / (float) numberOfPixel; // to not advantage long line
+
+    return score;
+
+}
+
+
+// return the lightness score adaptation of the pixel contain in l
+float shed::lineScoreWeighByMaskFactor( list<int*> l){
 
     ofColor color;
     float lightness;
 
     int numberOfPixel = 0;
     float score = 0;
-
-    int w = sketchImg.getWidth();
-    int h = sketchImg.getHeight();
-    float diagonal = sqrt(pow(w/2.0, 2) + pow(h/2.0, 2)); // should be the max norm
-
-    float dx = -1;
-    float dy = -1;
-    float norm = -1;
-    float factor = -1;
-
-
+    float tempScore = 0;
 
     for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++)
     {
         color = sketchImg.getColor( (*it)[0], (*it)[1] );
-        // get deltas of center
-        dx = (*it)[0] - (w/2.0) ;
-        dy = (*it)[1] - (w/2.0);
-        // compute norm from the center to the pixel position
-        norm = sqrt(pow(dx, 2) + pow(dy, 2));
-        factor = diagonal - norm;
-        // compute the standard score from lightness
         lightness = color.getLightness();
-        score =  score   + factor * (color.limit() - lightness) ;  //  weight the score
 
+        // calculate score using negative value for white and positive value for black
+        tempScore =  ( color.limit() - lightness) -  (color.limit() / 3 ) ;
+        // multiply by the mask factor
+        tempScore *= mask[(*it)[0]][(*it)[1]];
+
+        score += tempScore;
         numberOfPixel = numberOfPixel + 1;
 
     }
@@ -292,14 +322,39 @@ float shed::lineWeightScore(list<int*> l){
 
     return score;
 
-
-
 }
 
 
+// return the lightness score adaptation of the pixel contain in l
+float shed::lineScoreWeighByMaskFactorCumulative( list<int*> l){
 
+    ofColor color;
+    float lightness;
 
+    int numberOfPixel = 0;
+    float score = 0;
+    float tempScore = 0;
 
+    for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++)
+    {
+        color = sketchImg.getColor( (*it)[0], (*it)[1] );
+        lightness = color.getLightness();
+
+        // calculate score using negative value for white and positive value for black
+        tempScore =  ( color.limit() - lightness)  ;
+        // multiply by the mask factor
+        tempScore *= mask[(*it)[0]][(*it)[1]];
+
+        score += tempScore;
+        numberOfPixel = numberOfPixel + 1;
+
+    }
+
+    score = score / (float) numberOfPixel; // to not advantage long line
+
+    return score;
+
+}
 
 
 int shed::findNextBestPin(int pinIdx){
@@ -316,7 +371,7 @@ int shed::findNextBestPin(int pinIdx){
 
     for( int i = 0; i < wel.pinsNumber; i++){
         tempIdx = ( i + pinIdx) % wel.pinsNumber;
-        tempScore = lineScore(lines[pinIdx][tempIdx]);
+        tempScore = lineScoreWeighByMaskFactor(lines[pinIdx][tempIdx]);
 
 
         if (tempScore > bestScore){
@@ -329,15 +384,7 @@ int shed::findNextBestPin(int pinIdx){
 
 }
 
-// decrease the lightness of the pixel who index are contain in l
-void shed::decreaseDarkness(list<int*> l, float decreasingV) {
 
-    ofColor color(decreasingV,decreasingV,decreasingV);
-    drawer.incrementPixels(sketchImg, l, color);
-
-    sketchImg.update();
-
-}
 
 
 void shed::computeStringPath(){
@@ -362,28 +409,6 @@ void shed::computeStringPath(){
 
 }
 
-
-void shed::drawString(){
-
-    result.allocate(sketchImg.getWidth(), sketchImg.getHeight(), OF_IMAGE_COLOR);
-    result.setColor(ofColor::white);
-
-    int opacity = drawOpacityReal;
-
-    std::list<int>::iterator next_it = stringPath.begin();
-    next_it++;
-
-    for (std::list<int>::iterator it = stringPath.begin();  next_it  != stringPath.end()  ; it++)
-    {
-        drawer.decreasePixels(result, lines[*it][*next_it], ofColor(opacity,opacity,opacity));
-        next_it++;
-
-    }
-
-}
-
-
-
 void shed::computeNextPinAndDrawOneString(){
 
     if (! stopIncrementationP){
@@ -398,8 +423,11 @@ void shed::computeNextPinAndDrawOneString(){
         // decrease the value of the pixel that are under the line
         decreaseDarkness(lines[currentPinIdx1][nextPinIdx1], decreaseV);
 
+
         // draw the line
         drawer.decreasePixels(result, lines[currentPinIdx1][nextPinIdx1], ofColor(opacity,opacity,opacity));
+
+        std::cout << "step: " << currentPinIdx1 << ":" << nextPinIdx1 << std::endl;
 
         numberStringP++;
 
@@ -411,7 +439,6 @@ void shed::computeNextPinAndDrawOneString(){
 
 
 }
-
 
 void shed::randomifyNextPinAndDrawOneString(){
 
@@ -446,6 +473,33 @@ void shed::randomifyNextPinAndDrawOneString(){
 
 }
 
+
+
+
+
+
+
+
+void shed::drawString(){
+
+    result.allocate(sketchImg.getWidth(), sketchImg.getHeight(), OF_IMAGE_COLOR);
+    result.setColor(ofColor::white);
+
+    int opacity = drawOpacityReal;
+
+    std::list<int>::iterator next_it = stringPath.begin();
+    next_it++;
+
+    for (std::list<int>::iterator it = stringPath.begin();  next_it  != stringPath.end()  ; it++)
+    {
+        drawer.decreasePixels(result, lines[*it][*next_it], ofColor(opacity,opacity,opacity));
+        next_it++;
+
+    }
+
+}
+
+
 /*
  * Go through a the display image and set the original image if there is no preference factor at these position
 */
@@ -458,7 +512,7 @@ void shed::computeLeftDisplayImg()
 
     for( int x = 0 ; x < displayImg.getWidth(); x++ ){
         for ( int y = 0; y < displayImg.getHeight(); y++ ){
-            if (mask[x][y] != 0) {
+            if (mask[x][y] != 1) {
                displayImg.setColor(x,y, color);
             }
 
@@ -500,11 +554,22 @@ void shed::brushMask( int x, int y ,float ** brushType, int sizeBrush){
             tempIdxX = x - middle + i;
             tempIdxY = y - middle + j;
             if  (!( (tempIdxX < 0) or (tempIdxX > w -1 ) or (tempIdxY < 0 ) or (tempIdxY > h -1 ) ) ) { // border case of the brush
-                mask[tempIdxX][tempIdxY] += brushType[i][j];
+                mask[tempIdxX][tempIdxY] *= brushType[i][j];
             }
          }
 
     }
+
+
+
+}
+
+
+ofImage shed::displayGrid()
+{
+
+    ofImage ret;
+
 
 
 

@@ -90,6 +90,13 @@ public:
     void computeLeftDisplayImg();
 
     void brushMask(int x, int y, float ** brushType, int sizeBrush);
+    float lineScoreWeighByMaskFactor(list<int *> l);
+
+    float lineScoreWeighByMaskFactorCumulative(list<int *> l);
+    float lineScoreDelta(list<int *> l);
+
+    ofImage displayGrid();
+
 };
 
 

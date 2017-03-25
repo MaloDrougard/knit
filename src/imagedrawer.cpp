@@ -182,13 +182,14 @@ void imageDrawer::drawPixels(ofImage &img, list<int * > l, ofColor color)
 
 
 
-void imageDrawer::incrementPixels(ofImage &img, list<int * > l, ofColor color)
+void imageDrawer::incrementPixels(ofImage &img, list<int * > l, ofColor inColor)
 {
+    ofColor color = ofColor::white;
 
     for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++){
 
         color = img.getColor((*it)[0],  (*it)[1]);
-        color = color + color;
+        color = color + inColor;
         img.setColor((*it)[0],  (*it)[1], color);
     }
 
