@@ -14,22 +14,29 @@ public:
 
     ofParameterGroup allParameters;
     ofParameter<bool> oneRandom ;
+    ofParameter<bool> stopAlgo;
+
+
+    ofParameterGroup leftImgParameters;
+    ofParameter<bool> displaySketch ;
+    ofParameter<bool> brushingMode; // display the brushed image and allow user to draw with the brush
+    ofParameter<bool> displayGrid ;
+    ofParameter<bool> displayOriginal;
+    ofxButton saveLeftImgBtn;
+
 
     ofImage pic;
     shed * workshop;
     int numberOfCall;
 
-    ofxPanel gui;
+    ofxPanel guiAlgo;
+    ofxPanel guiLeftImg;
 
     zone zoneA;
     zone zoneB;
 
-    zone buttonA;
-
     float ** brush ;
     int brushSize ;
-
-
 
 
 
@@ -50,7 +57,6 @@ public:
     void gotMessage(ofMessage msg);
 
     void setupBrush();
-
     void onMouseInZoneA(ofVec2f &relPos);
-    void onMousePressedOnButtonA(ofVec2f &relPos);
+
 };

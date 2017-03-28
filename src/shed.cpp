@@ -3,21 +3,26 @@
 
 shed::shed(ofImage oriImg)
 {
+
     setupParameter();
 
     originalImg = oriImg;
+    setOriginalImgCrop();
 
 
+    w = originalImgCrop.getWidth();
+    h = originalImgCrop.getHeight();
 
 
     // initialize the sketch image who is use to perform the computation
     setSketch();
+    setBrushedImg();
 
-    w = sketchImg.getWidth();
-    h = sketchImg.getHeight();
+    setEmptyResult();
+    setEmptyGridImg();
+
 
     initializeMask();
-    setDisplayImg();
 
 
     // initialize drawer, it's a utility tool to access image
@@ -30,35 +35,43 @@ shed::shed(ofImage oriImg)
     initializeLines();
 
 
-    setEmptyResult();
-    setEmptyGridImg();
-
     currentPinIdx1 = 0;
     nextPinIdx1 = -1;
 
 }
 
-void shed::setSketch(){
+
+/*
+ * Crop the original Img if needed
+*/
+void shed::setOriginalImgCrop(){
 
     int w = originalImg.getWidth();
     int h = originalImg.getHeight();
 
-    sketchImg.clone(originalImg);
+    originalImgCrop.clone(originalImg);
 
     int diff = 0;
     if( w > h ){
         diff = w - h;
-        sketchImg.crop(diff/2, 0, h, h);
+        originalImgCrop.crop(diff/2, 0, h, h);
     } else {
         diff = h - w;
-        sketchImg.crop(0, diff/2,  w, w);
+        originalImgCrop.crop(0, diff/2,  w, w);
     }
 
+    originalImgCrop.update();
+}
+
+
+void shed::setSketch()
+{
+    sketchImg.clone(originalImgCrop);
     sketchImg.update();
 }
 
-void shed::setEmptyResult(){
-
+void shed::setEmptyResult()
+{
     result.allocate(w, h , OF_IMAGE_COLOR);
     result.setColor(ofColor::white);
     gridImg.update();
@@ -72,23 +85,36 @@ void shed::setEmptyGridImg()
 
 }
 
-void shed::setDisplayImg()
+void shed::setBrushedImg()
+{
+    brushedImg.clone(originalImgCrop);
+    brushedImg.update();
+}
+
+
+/*
+ * Draw the grid on gridImg
+ */
+void shed::drawGridOnImg()
 {
 
-    displayImg.clone(originalImg);
+    list<int *> l;
 
-    int diff = 0;
-    if( w > h ){
-        diff = w - h;
-        displayImg.crop(diff/2, 0, h, h);
-    } else {
-        diff = h - w;
-        displayImg.crop(0, diff/2,  w, w);
+
+    for(int i = 0; i < wel.pinsNumber; i ++ ){
+        for(int j = 0; j < wel.pinsNumber; j++){
+
+            l = lines[i][j];
+            drawer.decreasePixels(gridImg, l, ofColor(2,2,2));
+        }
     }
 
-    displayImg.update();
+    gridImg.update();
 
 }
+
+
+
 
 void shed::initializeMask()
 {
@@ -169,15 +195,9 @@ void shed::setupParameter(){
 
     shedParameter.setName("Shed Parameters");
     shedParameter.add(numberStringP.set("#strings",0, 0, 20000));
-    shedParameter.add(numberPinsP.set("#pins",500, 4, 1200));
+    shedParameter.add(numberPinsP.set("#pins",50, 4, 1200));
     shedParameter.add(algoOpacityP.set("algo opacity",56,0,255));
     shedParameter.add(drawOpacityP.set("draw opacity",36,0,255));
-
-    shedParameter.add(stopIncrementationP.set("stop drawing", false));
-
-
-    numberStringReal = numberStringP;
-    algoOpacityReal = algoOpacityP;
 }
 
 
@@ -187,41 +207,6 @@ shed::~shed(){
          delete [] lines[i] ;
     }
     delete [] lines;
-
-}
-
-
-
-void shed::checkchange(){
-
-    if(numberPinsP != wel.pinsNumber){
-        destroyLine();
-        setWheel();
-        setSketch();
-        initializeLines();
-        computeStringPath();
-        drawString();
-    }
-
-    if(numberStringReal != numberStringP){
-        numberStringReal = numberStringP;
-        setSketch();
-        computeStringPath();
-        drawString();
-    }
-
-    if(algoOpacityReal != algoOpacityP){
-        algoOpacityReal = algoOpacityP;
-        setSketch();
-        computeStringPath();
-        drawString();
-    }
-
-    if(drawOpacityReal != drawOpacityP){
-        drawOpacityReal = drawOpacityP;
-        drawString();
-    }
-
 
 }
 
@@ -398,42 +383,15 @@ int shed::findNextBestPin(int pinIdx){
 
 
 
-void shed::computeStringPath(){
-
-    float decreaseV = algoOpacityReal;
-
-    stringPath.clear();
-    stringPath.push_back(0);
-
-    int currentPinIdx = 0;
-    int nextPinIdx = -1;
-
-    for( int i = 0 ; i< numberStringReal; i++ ){
-        nextPinIdx = findNextBestPin(currentPinIdx);
-        // decrease the value of the pixel that are under the line
-
-        decreaseDarkness(lines[currentPinIdx][nextPinIdx], decreaseV);
-
-        stringPath.push_back(nextPinIdx);
-        currentPinIdx = nextPinIdx;
-    }
-
-}
-
 void shed::computeNextPinAndDrawOneString(){
-
-    if (! stopIncrementationP){
-
 
         float decreaseV = algoOpacityP;
         int opacity = drawOpacityP;
-
 
         nextPinIdx1 = findNextBestPin(currentPinIdx1);
 
         // decrease the value of the pixel that are under the line
         decreaseDarkness(lines[currentPinIdx1][nextPinIdx1], decreaseV);
-
 
         // draw the line
         drawer.decreasePixels(result, lines[currentPinIdx1][nextPinIdx1], ofColor(opacity,opacity,opacity));
@@ -442,20 +400,17 @@ void shed::computeNextPinAndDrawOneString(){
 
         numberStringP++;
 
+
+        // save path
+        stringPath.push_back(currentPinIdx1);
+
         // update the pin
         currentPinIdx1 = nextPinIdx1;
-
-
-    }
-
 
 }
 
 void shed::randomifyNextPinAndDrawOneString(){
 
-
-    std::cout << "  we are inside drawOne "<< std::endl;
-    if (! stopIncrementationP){
 
         float decreaseV = algoOpacityP;
         int opacity = drawOpacityP;
@@ -468,19 +423,13 @@ void shed::randomifyNextPinAndDrawOneString(){
 
         // draw the line
         drawer.decreasePixels(result, lines[currentPinIdx1][nextPinIdx1], ofColor(opacity,opacity,opacity));
-
-
-
-        std::cout << "      we are computing in drawOne.    currentPin: "<<  currentPinIdx1 << ", nextPin: " << nextPinIdx1 << std::endl;
-
         numberStringP++;
+
+        // save path
+        stringPath.push_back(currentPinIdx1);
 
         // update the pin
         currentPinIdx1 = nextPinIdx1;
-
-
-    }
-
 
 }
 
@@ -489,14 +438,12 @@ void shed::randomifyNextPinAndDrawOneString(){
 
 
 
-
-
-void shed::drawString(){
+void shed::drawStrings(){
 
     result.allocate(sketchImg.getWidth(), sketchImg.getHeight(), OF_IMAGE_COLOR);
     result.setColor(ofColor::white);
 
-    int opacity = drawOpacityReal;
+    int opacity = drawOpacityP;
 
     std::list<int>::iterator next_it = stringPath.begin();
     next_it++;
@@ -514,23 +461,23 @@ void shed::drawString(){
 /*
  * Go through a the display image and set the original image if there is no preference factor at these position
 */
-void shed::computeLeftDisplayImg()
+void shed::computeBrushedImg()
 {
 
-    setDisplayImg();
+    setBrushedImg();
 
     ofColor color = ofColor::lavender;
 
-    for( int x = 0 ; x < displayImg.getWidth(); x++ ){
-        for ( int y = 0; y < displayImg.getHeight(); y++ ){
+    for( int x = 0 ; x < brushedImg.getWidth(); x++ ){
+        for ( int y = 0; y < brushedImg.getHeight(); y++ ){
             if (mask[x][y] != 1) {
-               displayImg.setColor(x,y, color);
+               brushedImg.setColor(x,y, color);
             }
 
         }
     }
 
-    displayImg.update();
+    brushedImg.update();
 
 
 }
@@ -548,7 +495,7 @@ void shed::computeLeftDisplayImg()
  *
  *
 */
-void shed::brushMask( int x, int y ,float ** brushType, int sizeBrush){
+void shed::drawWithBrushOnMask( int x, int y ,float ** brushType, int sizeBrush){
 
     int tempIdxX = 0;
     int tempIdxY = 0;
@@ -572,24 +519,6 @@ void shed::brushMask( int x, int y ,float ** brushType, int sizeBrush){
     }
 
 
-
-}
-
-void shed::setGrid()
-{
-
-    list<int *> l;
-
-
-    for(int i = 0; i < wel.pinsNumber; i ++ ){
-        for(int j = 0; j < wel.pinsNumber; j++){
-
-            l = lines[i][j];
-            drawer.decreasePixels(gridImg, l, ofColor(2,2,2));
-        }
-    }
-
-    gridImg.update();
 
 }
 
