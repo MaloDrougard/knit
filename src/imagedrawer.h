@@ -16,18 +16,17 @@ public:
 
     void drawPins(ofImage &img, ofVec2f* pins, int pinsNumber);
 
-    list<int *> getPixelIdxOfALine(ofImage &img, ofVec2f l1, ofVec2f l2, float tolerence = 0.5);
-
     void printListIdx(list<int *> l);
 
     void drawPixels(ofImage &img, list<int *>, ofColor color = ofColor(23,56,77));
 
-    list<int *> getPixelIdxOfALineDDAAlgo(ofImage &img, ofVec2f l1, ofVec2f l2);
+    void getPixelIdxOfALineDDAAlgo(list<int*> * l, ofImage &img, ofVec2f l1, ofVec2f l2);
 
     void incrementPixels(ofImage &img, list<int *> l, ofColor color);
 
     void decreasePixels(ofImage &img, list<int *> l, ofColor color);
 
+    void freeListOf2Int(list<int *> * l);
 };
 
 #endif // IMAGEDRAWER_H

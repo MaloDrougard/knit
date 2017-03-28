@@ -34,15 +34,10 @@ public:
     wheel wel;
     imageDrawer drawer;
 
-    list<int*> ** lines;
+    list<int*> * ** lines;
     list<int> stringPath;
 
     shed(ofImage oriImg);
-    ~shed();
-
-
-
-
 
     void setupParameter();
 
@@ -83,6 +78,9 @@ public:
     void computeBrushedImg();
 
     void drawGridOnImg();
+
+
+    void restart(int pinsNumber);
 
 };
 

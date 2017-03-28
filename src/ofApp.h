@@ -24,6 +24,11 @@ public:
     ofParameter<bool> displayOriginal;
     ofxButton saveLeftImgBtn;
 
+    ofParameterGroup restartParamaters;
+    ofParameter<int> pinsNumberP;
+    ofxButton restartBtn;
+
+
 
     ofImage pic;
     shed * workshop;
@@ -31,6 +36,8 @@ public:
 
     ofxPanel guiAlgo;
     ofxPanel guiLeftImg;
+    ofxPanel guiRestart;
+
 
     zone zoneA;
     zone zoneB;
@@ -58,5 +65,6 @@ public:
 
     void setupBrush();
     void onMouseInZoneA(ofVec2f &relPos);
+    void onRestartPressed();
 
 };

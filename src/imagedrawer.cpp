@@ -48,41 +48,10 @@ void imageDrawer::drawALine(ofImage &img, ofVec2f l1, ofVec2f l2, float toleranc
 
 }
 
-// return the pixel index of the pixel touch by the line
-list<int *>  imageDrawer::getPixelIdxOfALine(ofImage &img, ofVec2f l1, ofVec2f l2, float tolerance){
-
-    list<int *> ret ;
-
-    int w = img.getWidth();
-    int h = img.getHeight();
-
-    ofVec2f tempPoint(0,0);
-    int * xy ;
-
-
-
-    for(int x = 0 ; x < w; x++){
-        for(int y = 0; y < h; y++){
-
-            tempPoint.set(x + 0.5,y + 0.5); // we want the center of the pixel
-            if( this->isPointOnLine(tempPoint, l1, l2, tolerance) ){
-                xy = new int[2];
-                xy[0] = x;
-                xy[1] = y;
-
-                ret.push_front( xy ) ;
-            }
-        }
-    }
-
-    return ret;
-}
-
 
 // return the pixel index of the pixel touch by the line
-list<int *>  imageDrawer::getPixelIdxOfALineDDAAlgo(ofImage &img, ofVec2f l1, ofVec2f l2){
+void imageDrawer::getPixelIdxOfALineDDAAlgo(list<int*> * l, ofImage &img, ofVec2f l1, ofVec2f l2){
 
-    list<int*> ret;
     int * xy ;
 
     int x0 =  static_cast<int> (l1.x);
@@ -114,15 +83,24 @@ list<int *>  imageDrawer::getPixelIdxOfALineDDAAlgo(ofImage &img, ofVec2f l1, of
        xy[0] = static_cast<int>(x);
        xy[1] = static_cast<int>(y);
 
-       ret.push_back(xy);
+       l->push_back(xy);
 
        x = x + xIncrement;
        y = y + yIncrement;
     }
-
-   return ret;
 }
 
+
+void imageDrawer::freeListOf2Int(list<int *> * l )
+{
+    for(std::list<int *>::iterator it = l->begin(); it  != l->end(); it++){
+        delete[] *it;
+    }
+    l->clear();
+
+
+
+}
 
 
 void imageDrawer::printListIdx(list<int * > l ){

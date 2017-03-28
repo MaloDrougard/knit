@@ -11,8 +11,6 @@ wheel::wheel( int pinsNumber, float radius, ofVec2f center)
 }
 
 
-
-
 // generate the position of pins in the image axis
  void wheel::generatePins(){
 
@@ -29,7 +27,10 @@ wheel::wheel( int pinsNumber, float radius, ofVec2f center)
 
  }
 
-
+ void wheel::deletePins()
+ {
+     delete[] pins;
+ }
 
 
 

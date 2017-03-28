@@ -22,10 +22,18 @@ void ofApp::setup(){
     leftImgParameters.add(displaySketch.set("Display sketching image", true));
     leftImgParameters.add(displayOriginal.set("Display original image", false));
     leftImgParameters.add(displayGrid.set("Display grid", false));
-    leftImgParameters.add(brushingMode.set("Allow to brush and display the brushed image", false));
+    leftImgParameters.add(brushingMode.set("Allow to brush", false));
 
     guiLeftImg.setup(leftImgParameters);
     guiLeftImg.add(saveLeftImgBtn.setup("Save Image"));
+
+
+
+    restartParamaters.setName("Restart");
+    restartParamaters.add(pinsNumberP.set("#pins", 200, 2, 600));
+
+    guiRestart.setup(restartParamaters);
+    guiRestart.add(restartBtn.setup("Restart"));
 
 
 
@@ -37,16 +45,18 @@ void ofApp::setup(){
     zoneB.setup(workshop->w, workshop->h, workshop->w + 40 , 20 );
 
     guiAlgo.setPosition(workshop->w + 30, 10);
-
+    guiRestart.setPosition(workshop->w +30, workshop->h +30);
 
     ofAddListener(zoneA.dragInside, //the ofEvent that we want to listen to. In this case exclusively to the circleEvent of redCircle (red circle) object.
                   this, //pointer to the class that is going to be listening. it can be a pointer to any object. There's no need to declare the listeners within the class that's going to listen.
                   &ofApp::onMouseInZoneA);//pointer to the method that's going to be called when a new event is broadcasted (callback method). The parameters of the event are passed to this method.
 
+    restartBtn.addListener(this, &ofApp::onRestartPressed);
+
 
 
     setupBrush();
-    workshop->drawGridOnImg();
+    //workshop->drawGridOnImg();
 
 }
 
@@ -128,6 +138,7 @@ void ofApp::draw(){
 
     guiAlgo.draw();
     guiLeftImg.draw();
+    guiRestart.draw();
 
     numberOfCall++;
 
@@ -198,5 +209,10 @@ void ofApp::onMouseInZoneA( ofVec2f & relPos){
         workshop->drawWithBrushOnMask( relPos[0] , relPos[1] , brush, brushSize);
     }
 
+}
+
+void ofApp::onRestartPressed()
+{
+    workshop->restart(pinsNumberP);
 }
 
