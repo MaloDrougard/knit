@@ -135,6 +135,10 @@ void ofApp::draw(){
     }
 
 
+    if ((numberOfCall %100 )== 0){ // not clean
+        workshop->computeDiffOrignalResult();
+    }
+
 
     guiAlgo.draw();
     guiLeftImg.draw();

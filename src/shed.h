@@ -28,6 +28,7 @@ public:
     ofParameter<int> numberPinsP;
     ofParameter<int> algoOpacityP;
     ofParameter<int> drawOpacityP;
+    ofParameter<int> diffError;
 
 
 
@@ -50,6 +51,7 @@ public:
     void setWheel();
     void setBrushedImg();
     void initializeMask();
+
 
 
 
@@ -79,6 +81,7 @@ public:
 
     void drawGridOnImg();
 
+    void computeDiffOrignalResult();// differance between the result and the original (counting the lightness differance)
 
     void restart(int pinsNumber);
 

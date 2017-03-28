@@ -4,7 +4,7 @@
 shed::shed(ofImage oriImg)
 {
 
-    setupParameter();
+
 
     originalImg = oriImg;
     setOriginalImgCrop();
@@ -13,12 +13,21 @@ shed::shed(ofImage oriImg)
     w = originalImgCrop.getWidth();
     h = originalImgCrop.getHeight();
 
+    setEmptyResult();
+
+
+    // calulate the "error" between the two image
+    computeDiffOrignalResult();
+
+    setupParameter();
+
+
+
 
     // initialize the sketch image who is use to perform the computation
     setSketch();
     setBrushedImg();
 
-    setEmptyResult();
     setEmptyGridImg();
 
 
@@ -45,9 +54,11 @@ void shed::setupParameter(){
 
     shedParameter.setName("Shed Parameters");
     shedParameter.add(numberStringP.set("#strings",0, 0, 20000));
-    shedParameter.add(numberPinsP.set("#pins",160, 4, 1200));
+    shedParameter.add(numberPinsP.set("#pins",240, 4, 1200));
     shedParameter.add(algoOpacityP.set("algo opacity",56,0,255));
     shedParameter.add(drawOpacityP.set("draw opacity",36,0,255));
+    int temp = diffError; // because we allready set the value
+    shedParameter.add(diffError.set("error",temp,0,temp+1000));
 }
 
 
@@ -127,6 +138,22 @@ void shed::drawGridOnImg()
 
 }
 
+void shed::computeDiffOrignalResult()
+{
+    int diff  = 0;
+    int tempLigthnessDiff = 0;
+
+    for(int x = 0; x < w; x++ ){
+        for(int y = 0; y < h; y++){
+               tempLigthnessDiff = (originalImgCrop.getColor(x,y)).getLightness() - (result.getColor(x,y)).getLightness();
+               tempLigthnessDiff = abs(tempLigthnessDiff);
+               diff += tempLigthnessDiff;
+        }
+    }
+
+    diffError.set(diff);
+}
+
 void shed::restart(int pinsNumber)
 {
     destroyLine(); // based also on wel
@@ -185,6 +212,7 @@ void shed::initializeLines(){
 
     // initializing lines
     lines = new list<int*> * * [wel.pinsNumber];
+
     for (int i = 0; i < wel.pinsNumber; i++) {
         lines[i] = new list<int*> * [wel.pinsNumber];
     }
@@ -206,7 +234,7 @@ void shed::initializeLines(){
 
 void shed::destroyLine(){
 
-    // FIXME
+    // FIXME half the first time work correctly but not the second ???
 
     list<int * > * tempL;
 
