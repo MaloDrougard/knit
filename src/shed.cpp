@@ -15,13 +15,10 @@ shed::shed(ofImage oriImg)
 
     setEmptyResult();
 
-
     // calulate the "error" between the two image
     computeDiffOrignalResult();
 
     setupParameter();
-
-
 
 
     // initialize the sketch image who is use to perform the computation
@@ -29,13 +26,21 @@ shed::shed(ofImage oriImg)
     setBrushedImg();
 
     setEmptyGridImg();
-
-
     initializeMask();
 
 
     // initialize drawer, it's a utility tool to access image
     drawer = imageDrawer();
+
+
+
+    currentPinIdx1 = 0;
+    nextPinIdx1 = -1;
+
+}
+
+// differ the setup from the init to get a chance to adjust parameters :)
+void shed::setup(){
 
     // set wheel that contains pins position
     setWheel();
@@ -44,21 +49,32 @@ shed::shed(ofImage oriImg)
     initializeLines();
 
 
-    currentPinIdx1 = 0;
-    nextPinIdx1 = -1;
 
+}
+
+shed::~shed()
+{
+    wel.deletePins();
+    destroyLine();
 }
 
 
 void shed::setupParameter(){
 
-    shedParameter.setName("Shed Parameters");
-    shedParameter.add(numberStringP.set("#strings",0, 0, 20000));
-    shedParameter.add(numberPinsP.set("#pins",240, 4, 1200));
-    shedParameter.add(algoOpacityP.set("algo opacity",56,0,255));
-    shedParameter.add(drawOpacityP.set("draw opacity",36,0,255));
+    // divide setup in start ans onFly
+
+    globalP.setName("Global Algorithm Parameters");
+    globalP.add(numberPinsP.set("#pins",240, 4, 1200));
+    globalP.add(maxNumberStringP.set("max #strings", 9000, -1, 10000) );
+
+    inFlyP.setName("In Fly Algorithm");
+    inFlyP.add(algoOpacityP.set("algo opacity",9,0,255));
+    inFlyP.add(drawOpacityP.set("draw opacity",9,0,255));
+
+    infoP.setName("Process infos");
+    infoP.add(numberStringP.set("#strings",0, 0, 20000));
     int temp = diffError; // because we allready set the value
-    shedParameter.add(diffError.set("error",temp,0,temp+1000));
+    infoP.add(diffError.set("error",temp,0,temp+1000));
 }
 
 
@@ -99,7 +115,7 @@ void shed::setEmptyResult()
 {
     result.allocate(w, h , OF_IMAGE_COLOR);
     result.setColor(ofColor::white);
-    gridImg.update();
+    result.update();
 }
 
 void shed::setEmptyGridImg()
@@ -153,31 +169,6 @@ void shed::computeDiffOrignalResult()
 
     diffError.set(diff);
 }
-
-void shed::restart(int pinsNumber)
-{
-    destroyLine(); // based also on wel
-    wel.deletePins();
-
-    numberPinsP.set("#pins",pinsNumber, 4, 1200);
-
-    setWheel();
-
-    initializeLines();
-    initializeMask();
-
-    setSketch();
-    setBrushedImg();
-    setEmptyResult();
-    setEmptyGridImg();
-
-    //drawGridOnImg();
-
-    currentPinIdx1 = 0;
-    nextPinIdx1 = -1;
-
-}
-
 
 
 
@@ -336,31 +327,33 @@ float shed::lineScoreDelta( list<int*> l){
 // return the lightness score adaptation of the pixel contain in l
 float shed::lineScoreWeighByMaskFactor( list<int*> l){
 
-    ofColor color;
-    float lightness;
 
-    int numberOfPixel = 0;
-    float score = 0;
-    float tempScore = 0;
 
-    for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++)
-    {
-        color = sketchImg.getColor( (*it)[0], (*it)[1] );
-        lightness = color.getLightness();
+        ofColor color;
+        float lightness;
 
-        // calculate score using negative value for white and positive value for black
-        tempScore =  ( color.limit() - lightness) -  (color.limit() / 3 ) ;
-        // multiply by the mask factor
-        tempScore *= mask[(*it)[0]][(*it)[1]];
+        int numberOfPixel = 0;
+        float score = 0;
+        float tempScore = 0;
 
-        score += tempScore;
-        numberOfPixel = numberOfPixel + 1;
+        for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++)
+        {
+            color = sketchImg.getColor( (*it)[0], (*it)[1] );
+            lightness = color.getLightness();
 
-    }
+            // calculate score using negative value for white and positive value for black
+            tempScore =  ( color.limit() - lightness) -  (color.limit() / 3 ) ;
+            // multiply by the mask factor
+            tempScore *= mask[(*it)[0]][(*it)[1]];
 
-    score = score / (float) numberOfPixel; // to not advantage long line
+            score += tempScore;
+            numberOfPixel = numberOfPixel + 1;
 
-    return score;
+        }
+
+        score = score / (float) numberOfPixel; // to not advantage long line
+
+        return score;
 
 }
 
@@ -368,31 +361,33 @@ float shed::lineScoreWeighByMaskFactor( list<int*> l){
 // return the lightness score adaptation of the pixel contain in l
 float shed::lineScoreWeighByMaskFactorCumulative( list<int*> l){
 
-    ofColor color;
-    float lightness;
 
-    int numberOfPixel = 0;
-    float score = 0;
-    float tempScore = 0;
 
-    for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++)
-    {
-        color = sketchImg.getColor( (*it)[0], (*it)[1] );
-        lightness = color.getLightness();
+        ofColor color;
+        float lightness;
 
-        // calculate score using negative value for white and positive value for black
-        tempScore =  ( color.limit() - lightness)  ;
-        // multiply by the mask factor
-        tempScore *= mask[(*it)[0]][(*it)[1]];
+        int numberOfPixel = 0;
+        float score = 0;
+        float tempScore = 0;
 
-        score += tempScore;
-        numberOfPixel = numberOfPixel + 1;
+        for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++)
+        {
+            color = sketchImg.getColor( (*it)[0], (*it)[1] );
+            lightness = color.getLightness();
 
-    }
+            // calculate score using negative value for white and positive value for black
+            tempScore =  ( color.limit() - lightness)  ;
+            // multiply by the mask factor
+            tempScore *= mask[(*it)[0]][(*it)[1]];
 
-    score = score / (float) numberOfPixel; // to not advantage long line
+            score += tempScore;
+            numberOfPixel = numberOfPixel + 1;
 
-    return score;
+        }
+
+        score = score / (float) numberOfPixel; // to not advantage long line
+
+        return score;
 
 }
 
@@ -429,6 +424,8 @@ int shed::findNextBestPin(int pinIdx){
 
 void shed::computeNextPinAndDrawOneString(){
 
+    if ((maxNumberStringP == -1 ) or (numberStringP < maxNumberStringP )) {
+
         float decreaseV = algoOpacityP;
         int opacity = drawOpacityP;
 
@@ -450,30 +447,33 @@ void shed::computeNextPinAndDrawOneString(){
 
         // update the pin
         currentPinIdx1 = nextPinIdx1;
-
+    }
 }
 
 void shed::randomifyNextPinAndDrawOneString(){
 
 
-        float decreaseV = algoOpacityP;
-        int opacity = drawOpacityP;
+    if ((maxNumberStringP == -1 ) or (numberStringP < maxNumberStringP )) {
+
+            float decreaseV = algoOpacityP;
+            int opacity = drawOpacityP;
 
 
-        nextPinIdx1 = rand() % numberPinsP ;
+            nextPinIdx1 = rand() % numberPinsP ;
 
-        // decrease the value of the pixel that are under the line
-        decreaseDarkness(*(lines[currentPinIdx1][nextPinIdx1]), decreaseV);
+            // decrease the value of the pixel that are under the line
+            decreaseDarkness(*(lines[currentPinIdx1][nextPinIdx1]), decreaseV);
 
-        // draw the line
-        drawer.decreasePixels(result, *(lines[currentPinIdx1][nextPinIdx1]), ofColor(opacity,opacity,opacity));
-        numberStringP++;
+            // draw the line
+            drawer.decreasePixels(result, *(lines[currentPinIdx1][nextPinIdx1]), ofColor(opacity,opacity,opacity));
+            numberStringP++;
 
-        // save path
-        stringPath.push_back(currentPinIdx1);
+            // save path
+            stringPath.push_back(currentPinIdx1);
 
-        // update the pin
-        currentPinIdx1 = nextPinIdx1;
+            // update the pin
+            currentPinIdx1 = nextPinIdx1;
+    }
 
 }
 

@@ -22,13 +22,18 @@ public:
     float ** mask;  // mask of the preference factor
 
 
-    ofParameterGroup shedParameter;
+    ofParameterGroup infoP;
+    ofParameter<int> numberStringP; // number of string currentlly in use
+    ofParameter<int> diffError;
 
-    ofParameter<int> numberStringP;
+    ofParameterGroup globalP;
     ofParameter<int> numberPinsP;
+    ofParameter<int> maxNumberStringP; // set -1 for infinity
+
+    ofParameterGroup inFlyP;
     ofParameter<int> algoOpacityP;
     ofParameter<int> drawOpacityP;
-    ofParameter<int> diffError;
+
 
 
 
@@ -39,6 +44,8 @@ public:
     list<int> stringPath;
 
     shed(ofImage oriImg);
+    ~shed();
+    void setup(); // set whell and lines (get a chance to adjust parameters before)
 
     void setupParameter();
 
@@ -82,8 +89,6 @@ public:
     void drawGridOnImg();
 
     void computeDiffOrignalResult();// differance between the result and the original (counting the lightness differance)
-
-    void restart(int pinsNumber);
 
 };
 

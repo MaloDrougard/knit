@@ -15,18 +15,17 @@ public:
     ofParameterGroup allParameters;
     ofParameter<bool> oneRandom ;
     ofParameter<bool> stopAlgo;
+    ofxButton startBtn;
 
 
     ofParameterGroup leftImgParameters;
     ofParameter<bool> displaySketch ;
     ofParameter<bool> brushingMode; // display the brushed image and allow user to draw with the brush
     ofParameter<bool> displayGrid ;
+    bool computeGridNeeded; // to know if we need to calculate the grid
     ofParameter<bool> displayOriginal;
     ofxButton saveLeftImgBtn;
 
-    ofParameterGroup restartParamaters;
-    ofParameter<int> pinsNumberP;
-    ofxButton restartBtn;
 
 
 
@@ -36,7 +35,7 @@ public:
 
     ofxPanel guiAlgo;
     ofxPanel guiLeftImg;
-    ofxPanel guiRestart;
+
 
 
     zone zoneA;
@@ -65,6 +64,6 @@ public:
 
     void setupBrush();
     void onMouseInZoneA(ofVec2f &relPos);
-    void onRestartPressed();
+    void onStartPressed();
 
 };

@@ -10,12 +10,21 @@ void ofApp::setup(){
     workshop = new shed(pic);
 
     numberOfCall = 0;
+    computeGridNeeded = true;
 
-    allParameters.setName("Parameters");
-    allParameters.add(oneRandom.set("Randomify next pin", false));
-    allParameters.add(stopAlgo.set("Stop Algorithm", false));
-    allParameters.add(workshop->shedParameter);
+    allParameters.setName("Parameters"); 
+
+    // add some parameters at on fly  (#FIXME ?: refactoring sparate parameter and algo)
+    workshop->inFlyP.add(oneRandom.set("Randomify next pin", false));
+    workshop->inFlyP.add(stopAlgo.set("Stop Algorithm", true));
+
+    allParameters.add(workshop->globalP);
+    allParameters.add(workshop->inFlyP);
+    allParameters.add(workshop->infoP);
+
     guiAlgo.setup(allParameters);
+    guiAlgo.add(startBtn.setup("Start"));
+
 
 
     leftImgParameters.setName("Left image interface");
@@ -29,14 +38,6 @@ void ofApp::setup(){
 
 
 
-    restartParamaters.setName("Restart");
-    restartParamaters.add(pinsNumberP.set("#pins", 200, 2, 600));
-
-    guiRestart.setup(restartParamaters);
-    guiRestart.add(restartBtn.setup("Restart"));
-
-
-
 
     zoneA = zone();
     zoneA.setup(workshop->w, workshop->h, 20, 20 );
@@ -45,18 +46,16 @@ void ofApp::setup(){
     zoneB.setup(workshop->w, workshop->h, workshop->w + 40 , 20 );
 
     guiAlgo.setPosition(workshop->w + 30, 10);
-    guiRestart.setPosition(workshop->w +30, workshop->h +30);
+
 
     ofAddListener(zoneA.dragInside, //the ofEvent that we want to listen to. In this case exclusively to the circleEvent of redCircle (red circle) object.
                   this, //pointer to the class that is going to be listening. it can be a pointer to any object. There's no need to declare the listeners within the class that's going to listen.
                   &ofApp::onMouseInZoneA);//pointer to the method that's going to be called when a new event is broadcasted (callback method). The parameters of the event are passed to this method.
 
-    restartBtn.addListener(this, &ofApp::onRestartPressed);
-
-
+    startBtn.addListener(this, &ofApp::onStartPressed );
 
     setupBrush();
-    //workshop->drawGridOnImg();
+
 
 }
 
@@ -124,7 +123,12 @@ void ofApp::draw(){
 
     }else if (displayGrid){
 
-        //workshop->setGrid();
+
+       if (computeGridNeeded){
+           workshop->drawGridOnImg();
+           computeGridNeeded = false;
+        }
+
         zoneA.drawImageInZone(workshop->gridImg);
 
     }else if (brushingMode){
@@ -142,7 +146,6 @@ void ofApp::draw(){
 
     guiAlgo.draw();
     guiLeftImg.draw();
-    guiRestart.draw();
 
     numberOfCall++;
 
@@ -215,8 +218,10 @@ void ofApp::onMouseInZoneA( ofVec2f & relPos){
 
 }
 
-void ofApp::onRestartPressed()
+void ofApp::onStartPressed()
 {
-    workshop->restart(pinsNumberP);
+    workshop->setup();
+    stopAlgo = false;
+
 }
 
