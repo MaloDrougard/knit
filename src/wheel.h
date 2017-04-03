@@ -25,4 +25,33 @@ public:
 
 
 
+class wheelWithCenter : public wheel
+{
+
+public:
+
+
+    wheelWithCenter( int pinsNumber=8, float radius=100, ofVec2f center=ofVec2f(0,0) );
+    void generatePins();
+
+
+};
+
+
+/*
+ *This class take  a list of ofVec and add pins from it
+ */
+class wheelExtra: public wheel
+{
+
+public:
+    list<ofVec2f> extraPins;
+    wheelExtra( int pinsNumber, float radius, ofVec2f center, std::list<ofVec2f> extraPins );
+    void generatePins();
+
+
+};
+
+
+
 #endif // WHEEL_H

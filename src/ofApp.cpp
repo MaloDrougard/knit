@@ -3,8 +3,11 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
+    saveOption = true;
 
-    pic.load("/home/makem/Cours/knitProject/inputPics/el-greco-bart-face-1.jpg");
+    outputFolder = "/home/makem/Cours/knitProject/outputPics/";
+    imageFn = "elgreco1";
+    pic.load("/home/makem/Cours/knitProject/inputPics/" + imageFn + ".jpg");
     pic.setImageType(OF_IMAGE_COLOR);
 
     workshop = new shed(pic);
@@ -34,7 +37,7 @@ void ofApp::setup(){
     leftImgParameters.add(brushingMode.set("Allow to brush", false));
 
     guiLeftImg.setup(leftImgParameters);
-    guiLeftImg.add(saveLeftImgBtn.setup("Save Image"));
+    guiLeftImg.add(saveImagesBtn.setup("Save Images"));
 
 
 
@@ -47,11 +50,12 @@ void ofApp::setup(){
 
     guiAlgo.setPosition(workshop->w + 30, 10);
 
-
     ofAddListener(zoneA.dragInside, //the ofEvent that we want to listen to. In this case exclusively to the circleEvent of redCircle (red circle) object.
                   this, //pointer to the class that is going to be listening. it can be a pointer to any object. There's no need to declare the listeners within the class that's going to listen.
                   &ofApp::onMouseInZoneA);//pointer to the method that's going to be called when a new event is broadcasted (callback method). The parameters of the event are passed to this method.
 
+
+    saveImagesBtn.addListener(this, &ofApp::onSaveImagesPressed);
     startBtn.addListener(this, &ofApp::onStartPressed );
 
     setupBrush();
@@ -143,6 +147,12 @@ void ofApp::draw(){
         workshop->computeDiffOrignalResult();
     }
 
+    if ((workshop->numberStringP % 1000 ) == 1 ){
+
+        this->onSaveImagesPressed();
+
+    }
+
 
     guiAlgo.draw();
     guiLeftImg.draw();
@@ -209,6 +219,7 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 
 }
 
+
 void ofApp::onMouseInZoneA( ofVec2f & relPos){
 
     if ( brushingMode){
@@ -218,9 +229,73 @@ void ofApp::onMouseInZoneA( ofVec2f & relPos){
 
 }
 
+
+
+
+
+void ofApp::onSaveImagesPressed()
+{
+
+
+    char buff[30];
+    time_t now = time(NULL);
+    strftime(buff, 30, "d:%Y%m%d-h:%H%M%S", localtime(&now));
+
+    string para =   "-n:" + imageFn
+                    + "-s:"+ std::to_string(workshop->numberStringP)
+                    + "-p:"+ std::to_string(workshop->numberPinsP)
+                    + "-ao:" + std::to_string(workshop->algoOpacityP)
+                    + "-do:" + std::to_string(workshop->drawOpacityP)
+                    + "-wt:" + "central"
+                    + "-e:"+ std::to_string(workshop->diffError);
+
+    string name =    std::string(buff)
+                    + "-i:result"
+                    + para
+                    + ".jpg";
+
+    workshop->result.save(outputFolder + name);
+    std::cout << "Image: " << name << " is saved in " << outputFolder << std::endl;
+
+    name =    std::string(buff)
+                    + "-i:sketch"
+                    + para
+                    + ".jpg";
+
+    workshop->sketchImg.save(outputFolder + name);
+    std::cout << "Image: " << name << " is saved in " << outputFolder << std::endl;
+
+
+
+    name =    std::string(buff)
+                    + "-i:originalcrop"
+                    + para
+                    + ".jpg";
+
+    workshop->originalImgCrop.save(outputFolder + name);
+    std::cout << "Image: " << name << " is saved in " << outputFolder << std::endl;
+
+
+    if (computeGridNeeded){
+        workshop->drawGridOnImg();
+        computeGridNeeded = false;
+     }
+
+
+    name =    std::string(buff)
+                    + "-i:grid"
+                    + para
+                    + ".jpg";
+
+    workshop->gridImg.save(outputFolder + name);
+    std::cout << "Image: " << name << " is saved in " << outputFolder << std::endl;
+
+
+}
+
 void ofApp::onStartPressed()
 {
-    workshop->setup();
+    workshop->setup2();
     stopAlgo = false;
 
 }

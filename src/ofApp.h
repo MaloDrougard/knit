@@ -1,10 +1,16 @@
 #pragma once
 
+#include <ctime>
+#include <chrono>
+#include <iostream>
+
 #include "ofMain.h"
 #include "wheel.h"
 #include "imagedrawer.h"
 #include "shed.h"
 #include "zone.h"
+
+
 
 #include "ofxGui.h"
 
@@ -24,11 +30,12 @@ public:
     ofParameter<bool> displayGrid ;
     bool computeGridNeeded; // to know if we need to calculate the grid
     ofParameter<bool> displayOriginal;
-    ofxButton saveLeftImgBtn;
+    ofxButton saveImagesBtn;
 
 
-
-
+    string outputFolder;
+    ofParameter<bool> saveOption;
+    string imageFn;
     ofImage pic;
     shed * workshop;
     int numberOfCall;
@@ -65,5 +72,7 @@ public:
     void setupBrush();
     void onMouseInZoneA(ofVec2f &relPos);
     void onStartPressed();
+
+    void onSaveImagesPressed();
 
 };

@@ -48,9 +48,28 @@ void shed::setup(){
     // set lines who represent all the strings possibilities betweens pins
     initializeLines();
 
+}
+
+
+// here we use the grid with a central pin also!
+// differ the setup from the init to get a chance to adjust parameters :)
+void shed::setup2(){
+
+    // set wheel that contains pins position
+    ofVec2f centerWheel = ofVec2f( w/2 , w/2 );
+    float radius = (w-1)/2.0 ;    // we want not to be at border but inside
+
+    ofVec2f tempA[] = {ofVec2f(400, 500), ofVec2f(500, 400), ofVec2f(300, 500), ofVec2f(200, 400)};
+    list<ofVec2f> tempL (tempA, tempA+4);
+    this->wel = wheelExtra(numberPinsP, radius, centerWheel, tempL);
+    // set lines who represent all the strings possibilities betweens pins
+
+    initializeLines();
+
 
 
 }
+
 
 shed::~shed()
 {
@@ -65,7 +84,7 @@ void shed::setupParameter(){
 
     globalP.setName("Global Algorithm Parameters");
     globalP.add(numberPinsP.set("#pins",240, 4, 1200));
-    globalP.add(maxNumberStringP.set("max #strings", 9000, -1, 10000) );
+    globalP.add(maxNumberStringP.set("max #strings", 19002, -1, 20000) );
 
     inFlyP.setName("In Fly Algorithm");
     inFlyP.add(algoOpacityP.set("algo opacity",9,0,255));
