@@ -3,7 +3,9 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
-    saveOption = true;
+    saveOption = false;
+    extraPins =  std::list<ofVec2f> ();
+
 
     outputFolder = "/home/makem/Cours/knitProject/outputPics/";
     imageFn = "elgreco1";
@@ -25,6 +27,7 @@ void ofApp::setup(){
     allParameters.add(workshop->inFlyP);
     allParameters.add(workshop->infoP);
 
+
     guiAlgo.setup(allParameters);
     guiAlgo.add(startBtn.setup("Start"));
 
@@ -35,7 +38,7 @@ void ofApp::setup(){
     leftImgParameters.add(displayOriginal.set("Display original image", false));
     leftImgParameters.add(displayGrid.set("Display grid", false));
     leftImgParameters.add(brushingMode.set("Allow to brush", false));
-
+    leftImgParameters.add(pinsSettingsMode.set("Draw pins", false));
     guiLeftImg.setup(leftImgParameters);
     guiLeftImg.add(saveImagesBtn.setup("Save Images"));
 
@@ -54,6 +57,8 @@ void ofApp::setup(){
                   this, //pointer to the class that is going to be listening. it can be a pointer to any object. There's no need to declare the listeners within the class that's going to listen.
                   &ofApp::onMouseInZoneA);//pointer to the method that's going to be called when a new event is broadcasted (callback method). The parameters of the event are passed to this method.
 
+
+    ofAddListener(zoneA.mousePressedInside,  this, &ofApp::onMousePressedInZoneA);
 
     saveImagesBtn.addListener(this, &ofApp::onSaveImagesPressed);
     startBtn.addListener(this, &ofApp::onStartPressed );
@@ -141,13 +146,18 @@ void ofApp::draw(){
         zoneA.drawImageInZone(workshop->brushedImg);
 
     }
+   else if (pinsSettingsMode){
+
+       zoneA.drawImageInZone(workshop->wel.representation);
+
+   }
 
 
     if ((numberOfCall %100 )== 0){ // not clean
         workshop->computeDiffOrignalResult();
     }
 
-    if ((workshop->numberStringP % 1000 ) == 1 ){
+    if (((workshop->numberStringP % 1000 ) == 1) and saveOption ){
 
         this->onSaveImagesPressed();
 
@@ -226,8 +236,16 @@ void ofApp::onMouseInZoneA( ofVec2f & relPos){
         std::cout << "mouseDraggesInZoneA "<< relPos[0] << ":"<< relPos[1] << std::endl;
         workshop->drawWithBrushOnMask( relPos[0] , relPos[1] , brush, brushSize);
     }
+    else if( pinsSettingsMode)
+    {
+          std::cout << "mousePressInZoneA "<< relPos[0] << ":"<< relPos[1] << std::endl;
+          extraPins.push_front(ofVec2f(relPos[0], relPos[1]));
+
+    }
 
 }
+
+
 
 
 
@@ -293,9 +311,21 @@ void ofApp::onSaveImagesPressed()
 
 }
 
+void ofApp::onMousePressedInZoneA(ofVec2f & relPos)
+{
+    if( pinsSettingsMode)
+    {
+          std::cout << "mousePressInZoneA "<< relPos[0] << ":"<< relPos[1] << std::endl;
+          extraPins.push_front(ofVec2f(relPos[0], relPos[1]));
+
+    }
+
+
+}
+
 void ofApp::onStartPressed()
 {
-    workshop->setup2();
+    workshop->setup3();
     stopAlgo = false;
 
 }

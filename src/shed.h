@@ -90,7 +90,9 @@ public:
 
     void computeDiffOrignalResult();// differance between the result and the original (counting the lightness differance)
 
-    void setup2(); // same as setup but use a whell with a central pin
+    void setup2(std::list<ofVec2f>); // same as setup but use a whell with a central pin
+    void setup3();
+
 };
 
 

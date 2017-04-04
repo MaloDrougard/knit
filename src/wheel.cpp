@@ -32,6 +32,34 @@ wheel::wheel( int pinsNumber, float radius, ofVec2f center)
      delete[] pins;
  }
 
+ void wheel::drawPins()
+ {
+     representation.allocate(2*radius + 1, 2*radius + 1, OF_IMAGE_COLOR);
+     representation.setColor(ofColor::white);
+
+     representation.update();
+
+     int x = 0;
+     int y = 0;
+
+     for (int i = 0; i < pinsNumber; i++ )
+     {
+         x = static_cast<int>((pins[i]).x);
+         y = static_cast<int>((pins[i]).y);
+
+
+         if(x < 0 or y < 0 or x > (2*radius-1) or y >( 2*radius -1)){
+             std::cout << "warring pins have an pin outside the image. Values: " << to_string(x) << ", " << to_string(y) << std::endl;
+         }
+
+         representation.setColor(x,y, ofColor::black);
+     }
+
+
+     representation.update();
+
+ }
+
 
 
 
@@ -89,7 +117,7 @@ wheel::wheel( int pinsNumber, float radius, ofVec2f center)
      }
 
 
-     float angleIncrement = (2 * M_PI) / (pinsNumber - 1);
+     float angleIncrement = (2 * M_PI) / (pinsNumber - (extraPins.size()));
      float angle = 0;
      ofVec2f baseVec = ofVec2f(1,0);
 
@@ -100,5 +128,98 @@ wheel::wheel( int pinsNumber, float radius, ofVec2f center)
         pins[i] = baseVec.getRotatedRad(- angle) + center; // - angle to get a counter clocwise indexing for image coordinate system
         angle = angle + angleIncrement;
      }
+
+ }
+
+ wheelTribal::wheelTribal(int pinsNumber, float radius, ofVec2f center)
+ {
+     this->pinsNumber = (2 * pinsNumber) ; // we allow memory for the center pin
+     this->pins = new ofVec2f[this->pinsNumber];
+     this->radius = radius;
+     this->center = center;
+     this->representation = ofImage();
+
+     this->generatePins();
+ }
+
+ void wheelTribal::generatePins()
+ {
+     float angleIncrement = (2 * M_PI) / (pinsNumber / 2);
+     float angle = 0;
+     ofVec2f baseVec = ofVec2f(1,0);
+
+     for ( int i = 0; i < (pinsNumber)/2; i = i + 1){
+        baseVec.set(1,0);
+        baseVec.scale(radius);
+        pins[i] = baseVec.getRotatedRad(- angle) + center; // - angle to get a counter clocwise indexing for image coordinate system
+        angle = angle + angleIncrement;
+     }
+
+
+     // draw the firs 1/3
+     angle = 0;
+     baseVec = ofVec2f((sqrt(3)/2), -0.5);
+     ofVec2f newCenter = ofVec2f(center.x, center.y + radius  );
+     int marge = (pinsNumber /2); // where to start to put int pins
+
+     ofVec2f tempRes = ofVec2f(-1,-1);
+
+     for ( int i = 0; i < (pinsNumber/(2*3) ); i = i + 1){
+        baseVec.set((sqrt(3)/2), -0.5);
+        baseVec.scale(radius);
+        tempRes = baseVec.getRotatedRad(- angle) + newCenter;
+        if(tempRes.x < 0 or tempRes.y < 0 or tempRes.x > (2*radius-1) or tempRes.y >( 2*radius -1)){
+            std::cout << "warring pins have an pin outside the image. Values: " << to_string(tempRes.x) << ", " << to_string(tempRes.y) << std::endl;
+        }
+        pins[marge + i] = tempRes; // - angle to get a counter clocwise indexing for image coordinate system
+        angle = angle + angleIncrement;
+     }
+
+
+     // draw the 2/3
+     angle = 0;
+     baseVec.set(1,0);
+     baseVec.scale(radius);
+     newCenter = baseVec.getRotated( 2*M_PI / 6) + center;
+
+     baseVec = ofVec2f(-(sqrt(3)/2), 0.5 );
+     marge = (pinsNumber /2) + (pinsNumber/(2*3)); // where to start to put int pins
+
+     tempRes = ofVec2f(-1,-1);
+
+     for ( int i = 0; i < ((pinsNumber/(2*3) -1) ); i = i + 1){
+        baseVec.set(-(sqrt(3)/2),0.5);
+        baseVec.scale(radius);
+        tempRes = baseVec.getRotatedRad(- angle) + newCenter;
+        if(tempRes.x < 0 or tempRes.y < 0 or tempRes.x > (2*radius-1) or tempRes.y >( 2*radius -1)){
+            std::cout << "warring pins have an pin outside the image. Values: " << to_string(tempRes.x) << ", " << to_string(tempRes.y) << std::endl;
+        }
+        pins[marge + i] = tempRes; // - angle to get a counter clocwise indexing for image coordinate system
+        angle = angle + angleIncrement;
+     }
+
+
+     // draw the 3/3
+     angle = 0;
+     baseVec.set(1,0);
+     baseVec.scale(radius);
+     newCenter = baseVec.getRotated( 2*(2*M_PI / 6)) + center;
+
+     baseVec = ofVec2f(-0.5,(sqrt(3)/2));
+     marge = (pinsNumber /2) + 2*(pinsNumber/(2*3)); // where to start to put int pins
+
+     tempRes = ofVec2f(-1,-1);
+
+     for ( int i = 0; i < ((pinsNumber/(2*3) -1) ); i = i + 1){
+        baseVec.set(-0.5,(sqrt(3)/2));
+        baseVec.scale(radius);
+        tempRes = baseVec.getRotatedRad(- angle) + newCenter;
+        if(tempRes.x < 0 or tempRes.y < 0 or tempRes.x > (2*radius-1) or tempRes.y >( 2*radius -1)){
+            std::cout << "warring pins have an pin outside the image. Values: " << to_string(tempRes.x) << ", " << to_string(tempRes.y) << std::endl;
+        }
+        pins[marge + i] = tempRes; // - angle to get a counter clocwise indexing for image coordinate system
+        angle = angle + angleIncrement;
+     }
+
 
  }

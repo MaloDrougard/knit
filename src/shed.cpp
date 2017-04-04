@@ -48,25 +48,44 @@ void shed::setup(){
     // set lines who represent all the strings possibilities betweens pins
     initializeLines();
 
+
+    this->wel.drawPins();
+
+
 }
 
 
 // here we use the grid with a central pin also!
 // differ the setup from the init to get a chance to adjust parameters :)
-void shed::setup2(){
+void shed::setup2(std::list<ofVec2f> extraPins){
 
     // set wheel that contains pins position
     ofVec2f centerWheel = ofVec2f( w/2 , w/2 );
     float radius = (w-1)/2.0 ;    // we want not to be at border but inside
 
-    ofVec2f tempA[] = {ofVec2f(400, 500), ofVec2f(500, 400), ofVec2f(300, 500), ofVec2f(200, 400)};
-    list<ofVec2f> tempL (tempA, tempA+4);
-    this->wel = wheelExtra(numberPinsP, radius, centerWheel, tempL);
+    this->wel = wheelExtra(numberPinsP, radius, centerWheel, extraPins);
     // set lines who represent all the strings possibilities betweens pins
 
     initializeLines();
 
+    this->wel.drawPins();
 
+
+
+}
+
+void shed::setup3()
+{
+    ofVec2f centerWheel = ofVec2f( w/2 , w/2 );
+    float radius = (w-1)/2.0 ;    // we want not to be at border but inside
+
+    this->wel = wheelTribal(numberPinsP, radius, centerWheel);
+
+    // set lines who represent all the strings possibilities betweens pins
+    initializeLines();
+
+
+    this->wel.drawPins();
 
 }
 

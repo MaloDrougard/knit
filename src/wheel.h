@@ -13,12 +13,14 @@ public:
     float radius;
     ofVec2f center;
     ofVec2f* pins; // array name are pointers
+    ofImage representation;
 
 
     wheel( int pinsNumber=8, float radius=100, ofVec2f center=ofVec2f(0,0) );
 
     void generatePins();
     void deletePins();
+    void drawPins();
 
 };
 
@@ -29,11 +31,8 @@ class wheelWithCenter : public wheel
 {
 
 public:
-
-
     wheelWithCenter( int pinsNumber=8, float radius=100, ofVec2f center=ofVec2f(0,0) );
     void generatePins();
-
 
 };
 
@@ -51,6 +50,19 @@ public:
 
 
 };
+
+
+
+class wheelTribal : public wheel
+{
+
+public:
+    wheelTribal( int pinsNumber=8, float radius=100, ofVec2f center=ofVec2f(0,0) );
+    void generatePins();
+
+};
+
+
 
 
 

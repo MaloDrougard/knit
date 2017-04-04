@@ -24,6 +24,7 @@ public:
     ofxButton startBtn;
 
 
+
     ofParameterGroup leftImgParameters;
     ofParameter<bool> displaySketch ;
     ofParameter<bool> brushingMode; // display the brushed image and allow user to draw with the brush
@@ -42,6 +43,8 @@ public:
 
     ofxPanel guiAlgo;
     ofxPanel guiLeftImg;
+
+
 
 
 
@@ -74,5 +77,10 @@ public:
     void onStartPressed();
 
     void onSaveImagesPressed();
+
+    // for pins settings
+    ofParameter<bool> pinsSettingsMode;
+    std::list<ofVec2f> extraPins;
+    void onMousePressedInZoneA(ofVec2f &relPos);
 
 };
