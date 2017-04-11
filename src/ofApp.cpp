@@ -3,12 +3,12 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
-    saveOption = false;
+    saveOption = true;
     extraPins =  std::list<ofVec2f> ();
 
 
     outputFolder = "/home/makem/Cours/knitProject/outputPics/";
-    imageFn = "elgreco1";
+    imageFn = "city1";
     pic.load("/home/makem/Cours/knitProject/inputPics/" + imageFn + ".jpg");
     pic.setImageType(OF_IMAGE_COLOR);
 
@@ -164,6 +164,7 @@ void ofApp::draw(){
     }
 
 
+
     guiAlgo.draw();
     guiLeftImg.draw();
 
@@ -317,15 +318,14 @@ void ofApp::onMousePressedInZoneA(ofVec2f & relPos)
     {
           std::cout << "mousePressInZoneA "<< relPos[0] << ":"<< relPos[1] << std::endl;
           extraPins.push_front(ofVec2f(relPos[0], relPos[1]));
-
     }
-
 
 }
 
 void ofApp::onStartPressed()
 {
-    workshop->setup3();
+
+    workshop->setup();
     stopAlgo = false;
 
 }

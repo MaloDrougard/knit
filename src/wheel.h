@@ -21,20 +21,25 @@ public:
     void generatePins();
     void deletePins();
     void drawPins();
+    void randomifyslightlyPosition(); // try to avoid morrié effect
 
 };
 
 
 
-
-class wheelWithCenter : public wheel
-{
+class wheelFromPolyLine: public wheel {
 
 public:
-    wheelWithCenter( int pinsNumber=8, float radius=100, ofVec2f center=ofVec2f(0,0) );
+    ofPolyline polyline;
+    wheelFromPolyLine(int pinsNumber, ofPolyline poly);
     void generatePins();
 
 };
+
+
+
+
+
 
 
 /*
@@ -46,13 +51,14 @@ class wheelExtra: public wheel
 public:
     list<ofVec2f> extraPins;
     wheelExtra( int pinsNumber, float radius, ofVec2f center, std::list<ofVec2f> extraPins );
-    void generatePins();
-
+    void generatePins(); 
 
 };
 
 
-
+/*
+ * This class a bretton flower
+ * */
 class wheelTribal : public wheel
 {
 

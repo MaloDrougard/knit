@@ -12,6 +12,8 @@ Project{
         name: { return FileInfo.baseName(path) }
 
         files: [
+            "src/grid.cpp",
+            "src/grid.h",
             "src/imagedrawer.cpp",
             "src/imagedrawer.h",
             "src/main.cpp",

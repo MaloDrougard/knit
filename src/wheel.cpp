@@ -61,37 +61,49 @@ wheel::wheel( int pinsNumber, float radius, ofVec2f center)
  }
 
 
-
-
-
- wheelWithCenter::wheelWithCenter(int pinsNumber, float radius, ofVec2f center)
- {
-     this->pinsNumber = pinsNumber + 1 ; // we allow memory for the center pin
-     this->pins = new ofVec2f[this->pinsNumber];
-     this->radius = radius;
-     this->center = center;
-
-     this->generatePins();
- }
-
- void wheelWithCenter::generatePins()
+ // move the position of the pins of one pixel
+ void wheel::randomifyslightlyPosition()
  {
 
-     float angleIncrement = (2 * M_PI) / (pinsNumber - 1);
-     float angle = 0;
-     ofVec2f baseVec = ofVec2f(1,0);
+     int x = 0;
+     int y = 0;
 
-     pins[0] = center;
+     int randx = 0;
+     int randy = 0;
 
-     for ( int i = 1; i < pinsNumber; i = i + 1){
-        baseVec.set(1,0);
-        baseVec.scale(radius);
-        pins[i] = baseVec.getRotatedRad(- angle) + center; // - angle to get a counter clocwise indexing for image coordinate system
-        angle = angle + angleIncrement;
+     int newX = 0;
+     int newY = 0;
+
+     for (int i = 0; i < pinsNumber; i++ )
+     {
+         x = static_cast<int>((pins[i]).x);
+         y = static_cast<int>((pins[i]).y);
+
+         randx = (rand() % 8) -  3;
+         randy = (rand() % 8)  - 3 ;
+
+
+         newX = x + randx;
+         newY = y + randy;
+
+         if(newX >= 0 and newX <= ( 2*radius -1) ) {
+            (pins[i]).x = newX;
+         }
+
+         if(newY >= 0 and newY <= ( 2*radius -1) ) {
+            (pins[i]).y = newY;
+         }
+
+
      }
 
-
  }
+
+
+
+
+
+
 
  wheelExtra::wheelExtra(int pinsNumber, float radius, ofVec2f center, std::list<ofVec2f> extraPins)
  {
@@ -221,5 +233,39 @@ wheel::wheel( int pinsNumber, float radius, ofVec2f center)
         angle = angle + angleIncrement;
      }
 
+
+ }
+
+ wheelFromPolyLine::wheelFromPolyLine(int pinsNumber, ofPolyline poly)
+ {
+     this->pinsNumber = pinsNumber;
+     this->polyline = poly.getResampledByCount(pinsNumber);     // force the polyline to have the correct number of points
+
+     ofRectangle tempRect = polyline.getBoundingBox();
+     this->center = tempRect.getCenter();
+
+     if (tempRect.getHeight() > tempRect.getWidth() ) {
+         this->radius = tempRect.getHeight() / 2.0;
+     } else {
+         this->radius = tempRect.getWidth() / 2.0;
+     }
+
+     this->pins = new ofVec2f[pinsNumber];
+
+     this->generatePins();
+
+     this->randomifyslightlyPosition();
+
+ }
+
+ void wheelFromPolyLine::generatePins()
+ {
+    std::vector<ofPoint> veritces = this->polyline.getVertices();
+    int i = 0;
+    for(auto it = veritces.begin(); it != veritces.end(); ++it) {
+
+        this->pins[i] = *it;
+        i++;
+    }
 
  }
