@@ -50,7 +50,7 @@ void imageDrawer::drawALine(ofImage &img, ofVec2f l1, ofVec2f l2, float toleranc
 
 
 // return the pixel index of the pixel touch by the line
-void imageDrawer::getPixelIdxOfALineDDAAlgo(list<int*> * l, ofImage &img, ofVec2f l1, ofVec2f l2){
+void imageDrawer::getPixelIdxOfALineDDAAlgo(list<int*> * l, ofVec2f l1, ofVec2f l2){
 
     int * xy ;
 

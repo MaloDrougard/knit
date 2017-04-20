@@ -1,3 +1,4 @@
+
 #include "ofApp.h"
 
 //--------------------------------------------------------------
@@ -8,7 +9,7 @@ void ofApp::setup(){
 
 
     outputFolder = "/home/makem/Cours/knitProject/outputPics/";
-    imageFn = "city1";
+    imageFn = "elgreco1";
     pic.load("/home/makem/Cours/knitProject/inputPics/" + imageFn + ".jpg");
     pic.setImageType(OF_IMAGE_COLOR);
 
@@ -66,6 +67,18 @@ void ofApp::setup(){
     setupBrush();
 
 
+    wheelParameters.setName("Grid paramters");
+    wheelParameters.add(numberOfPins.set("#pins", 240, 4, 720));
+    wheelParameters.add(typeOfWheel.set("Type of wheel", 1,1,4));
+    guiGrid.setup(wheelParameters);
+    guiGrid.add(gridValidationBtn.setup("Validtate grid"));
+
+    gridValidationBtn.addListener(this, &ofApp::gridValidation);
+
+
+
+
+
 }
 
 
@@ -97,7 +110,7 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
-    // workshop->checkchange();
+    // workshop->checkchange();WeilghByMaskFactor
     
     // std::cout << "call to drawOne number: " <<  numberOfCall << std::endl;
 
@@ -134,11 +147,11 @@ void ofApp::draw(){
 
 
        if (computeGridNeeded){
-           workshop->drawGridOnImg();
+           wel.drawGridRepresentation();
            computeGridNeeded = false;
         }
 
-        zoneA.drawImageInZone(workshop->gridImg);
+        zoneA.drawImageInZone(wel.gridRepresentation);
 
     }else if (brushingMode){
 
@@ -148,7 +161,8 @@ void ofApp::draw(){
     }
    else if (pinsSettingsMode){
 
-       zoneA.drawImageInZone(workshop->wel.representation);
+       wel.drawPins();
+       zoneA.drawImageInZone(wel.pinsRepresentation);
 
    }
 
@@ -167,6 +181,7 @@ void ofApp::draw(){
 
     guiAlgo.draw();
     guiLeftImg.draw();
+    guiGrid.draw();
 
     numberOfCall++;
 
@@ -265,7 +280,7 @@ void ofApp::onSaveImagesPressed()
                     + "-p:"+ std::to_string(workshop->numberPinsP)
                     + "-ao:" + std::to_string(workshop->algoOpacityP)
                     + "-do:" + std::to_string(workshop->drawOpacityP)
-                    + "-wt:" + "central"
+                    + "-sf:" + "equilibrate"
                     + "-e:"+ std::to_string(workshop->diffError);
 
     string name =    std::string(buff)
@@ -296,7 +311,7 @@ void ofApp::onSaveImagesPressed()
 
 
     if (computeGridNeeded){
-        workshop->drawGridOnImg();
+        wel.drawGridRepresentation();
         computeGridNeeded = false;
      }
 
@@ -305,8 +320,7 @@ void ofApp::onSaveImagesPressed()
                     + "-i:grid"
                     + para
                     + ".jpg";
-
-    workshop->gridImg.save(outputFolder + name);
+    wel.gridRepresentation.save(outputFolder + name);
     std::cout << "Image: " << name << " is saved in " << outputFolder << std::endl;
 
 
@@ -322,10 +336,21 @@ void ofApp::onMousePressedInZoneA(ofVec2f & relPos)
 
 }
 
-void ofApp::onStartPressed()
+void ofApp::gridValidation()
 {
 
-    workshop->setup();
+        int w = workshop->w;
+
+        this->wel = wheelCircle(numberOfPins, w, w);
+        this->wel.setupWithRandomification();
+
+        this->workshop->setupWheel(this->wel);
+
+
+}
+
+void ofApp::onStartPressed()
+{
     stopAlgo = false;
 
 }

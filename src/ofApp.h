@@ -83,4 +83,15 @@ public:
     std::list<ofVec2f> extraPins;
     void onMousePressedInZoneA(ofVec2f &relPos);
 
+
+    ofxPanel guiGrid;
+    ofParameterGroup wheelParameters;
+    ofParameter<int> numberOfPins;
+    ofParameter<int> typeOfWheel;
+    ofxButton gridValidationBtn;
+
+    abstractWheel wel;
+
+    void gridValidation();
+
 };

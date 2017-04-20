@@ -1,18 +1,215 @@
 #include "wheel.h"
 
-wheel::wheel( int pinsNumber, float radius, ofVec2f center)
+
+abstractWheel::abstractWheel(int pinsNumber , int w , int h )
 {
     this->pinsNumber = pinsNumber;
     this->pins = new ofVec2f[this->pinsNumber];
-    this->radius = radius;
-    this->center = center;
+    this->w = w;
+    this->h = h;
 
-    this->generatePins();
+    drawer = imageDrawer();
+
+}
+
+
+void abstractWheel::setupWithRandomification()
+{
+    this->randomifyslightlyPosition();
+    this->initializeLines();
+
+}
+
+void abstractWheel::setup(){
+
+    this->initializeLines();
+}
+
+
+void abstractWheel::generatePins()
+{
+    for ( int i = 0; i < pinsNumber; i = i + 1){
+
+       pins[i] = ofVec2f(0,0);
+    }
+}
+
+
+
+void abstractWheel::initializeLines(){
+
+    list<int*> * tempL;
+
+    // initializing lines
+    lines = new list<int*> * * [pinsNumber];
+
+    for (int i = 0; i < pinsNumber; i++) {
+        lines[i] = new list<int*> * [pinsNumber];
+    }
+
+    for(int i = 0; i < pinsNumber; i ++ ){
+        for(int j = 0; j < pinsNumber; j++){
+
+            tempL = new list<int*>;
+            lines[i][j] = tempL;
+
+            if ( i != j){
+                drawer.getPixelIdxOfALineDDAAlgo(tempL, pins[i], pins[j]);
+            }
+
+        }
+
+    }
+}
+
+void abstractWheel::destroyLines(){
+
+    // FIXME half the first time work correctly but not the second ???
+
+    list<int * > * tempL;
+
+
+
+    for( int x = 0; x < pinsNumber; x++)
+    {
+        for( int y= 0; y < pinsNumber; y++){
+            tempL = lines[x][y];
+            drawer.freeListOf2Int(tempL);
+            delete tempL;
+        }
+    }
+
+    for (int i = 0; i < pinsNumber; i++ ){ // is it correct ? needed?
+         delete[] lines[i] ;
+    }
+    delete[] lines;
+
+}
+
+
+
+
+void abstractWheel::deletePins()
+{
+     delete[] pins;
+}
+
+
+
+
+// move the position of the pins of one pixel
+void abstractWheel::randomifyslightlyPosition()
+{
+
+    int x = 0;
+    int y = 0;
+
+    int randx = 0;
+    int randy = 0;
+
+    int newX = 0;
+    int newY = 0;
+
+    for (int i = 0; i < pinsNumber; i++ )
+    {
+        x = static_cast<int>((pins[i]).x);
+        y = static_cast<int>((pins[i]).y);
+
+        randx = (rand() % 8) -  3;
+        randy = (rand() % 8)  - 3 ;
+
+
+        newX = x + randx;
+        newY = y + randy;
+
+        if(newX >= 0 and newX < this->w) {
+           (pins[i]).x = newX;
+        }
+
+        if(newY >= 0 and newY < this->h ) {
+           (pins[i]).y = newY;
+        }
+
+
+    }
+
+}
+
+
+
+
+void abstractWheel::drawPins()
+{
+    pinsRepresentation.allocate(this->w, this->h, OF_IMAGE_COLOR);
+    pinsRepresentation.setColor(ofColor::white);
+
+    pinsRepresentation.update();
+
+    int x = 0;
+    int y = 0;
+
+    for (int i = 0; i < pinsNumber; i++ )
+    {
+        x = static_cast<int>((pins[i]).x);
+        y = static_cast<int>((pins[i]).y);
+
+
+        if(x < 0 or y < 0 or x >= this->w or y >= this->h ){
+            std::cout << "warring pins have an pin outside the image. Values: " << to_string(x) << ", " << to_string(y) << std::endl;
+        }
+
+        pinsRepresentation.setColor(x,y, ofColor::black);
+    }
+
+
+     pinsRepresentation.update();
+
+}
+
+
+
+void abstractWheel::drawGridRepresentation()
+{
+
+    list<int *> l;
+
+    gridRepresentation.allocate(this->w, this->h, OF_IMAGE_COLOR);
+    gridRepresentation.setColor(ofColor::white);
+
+    for(int i = 0; i < pinsNumber; i ++ ){
+        for(int j = 0; j < pinsNumber; j++){
+
+            l = *(lines[i][j]);
+            drawer.decreasePixels(gridRepresentation, l, ofColor(2,2,2));
+        }
+    }
+    gridRepresentation.update();
+
+}
+
+
+
+wheelCircle::wheelCircle( int pinsNumber, int w, int h)
+{
+
+
+    this->pinsNumber = pinsNumber;
+    this->w = w;
+    this->h = h;
+
+    this->pins = new ofVec2f[this->pinsNumber];
+    this->radius = (w/2.0) - 1;
+    this->center =ofVec2f(w/2.0, h/2.0);
+
+    drawer = imageDrawer();
+
+    generatePins();
+
 }
 
 
 // generate the position of pins in the image axis
- void wheel::generatePins(){
+ void wheelCircle::generatePins(){
 
      float angleIncrement = (2 * M_PI) / pinsNumber;
      float angle = 0;
@@ -27,83 +224,7 @@ wheel::wheel( int pinsNumber, float radius, ofVec2f center)
 
  }
 
- void wheel::deletePins()
- {
-     delete[] pins;
- }
-
- void wheel::drawPins()
- {
-     representation.allocate(2*radius + 1, 2*radius + 1, OF_IMAGE_COLOR);
-     representation.setColor(ofColor::white);
-
-     representation.update();
-
-     int x = 0;
-     int y = 0;
-
-     for (int i = 0; i < pinsNumber; i++ )
-     {
-         x = static_cast<int>((pins[i]).x);
-         y = static_cast<int>((pins[i]).y);
-
-
-         if(x < 0 or y < 0 or x > (2*radius-1) or y >( 2*radius -1)){
-             std::cout << "warring pins have an pin outside the image. Values: " << to_string(x) << ", " << to_string(y) << std::endl;
-         }
-
-         representation.setColor(x,y, ofColor::black);
-     }
-
-
-      representation.update();
-
- }
-
-
- // move the position of the pins of one pixel
- void wheel::randomifyslightlyPosition()
- {
-
-     int x = 0;
-     int y = 0;
-
-     int randx = 0;
-     int randy = 0;
-
-     int newX = 0;
-     int newY = 0;
-
-     for (int i = 0; i < pinsNumber; i++ )
-     {
-         x = static_cast<int>((pins[i]).x);
-         y = static_cast<int>((pins[i]).y);
-
-         randx = (rand() % 8) -  3;
-         randy = (rand() % 8)  - 3 ;
-
-
-         newX = x + randx;
-         newY = y + randy;
-
-         if(newX >= 0 and newX <= ( 2*radius -1) ) {
-            (pins[i]).x = newX;
-         }
-
-         if(newY >= 0 and newY <= ( 2*radius -1) ) {
-            (pins[i]).y = newY;
-         }
-
-
-     }
-
- }
-
-
-
-
-
-
+/*
 
  wheelExtra::wheelExtra(int pinsNumber, float radius, ofVec2f center, std::list<ofVec2f> extraPins)
  {
@@ -244,17 +365,20 @@ wheel::wheel( int pinsNumber, float radius, ofVec2f center)
      ofRectangle tempRect = polyline.getBoundingBox();
      this->center = tempRect.getCenter();
 
+
      if (tempRect.getHeight() > tempRect.getWidth() ) {
-         this->radius = tempRect.getHeight() / 2.0;
+         this->w = tempRect.getHeight() ;
+         this->h = tempRect.getHeight() ; // we want a square
      } else {
-         this->radius = tempRect.getWidth() / 2.0;
+         this->w = tempRect.getWidth();
+         this->h = tempRect.getHeight();
      }
 
      this->pins = new ofVec2f[pinsNumber];
 
      this->generatePins();
 
-     this->randomifyslightlyPosition();
+     // this->randomifyslightlyPosition();
 
  }
 
@@ -269,3 +393,5 @@ wheel::wheel( int pinsNumber, float radius, ofVec2f center)
     }
 
  }
+*/
+

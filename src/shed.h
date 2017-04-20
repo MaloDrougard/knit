@@ -17,7 +17,7 @@ public:
     ofImage sketchImg; // use by the algo
     ofImage result;
     ofImage brushedImg; // image use for the left diplay
-    ofImage gridImg; //
+
 
     float ** mask;  // mask of the preference factor
 
@@ -37,7 +37,7 @@ public:
 
 
 
-    wheel wel;
+    abstractWheel wel;
     imageDrawer drawer;
 
     list<int*> * ** lines;
@@ -45,16 +45,14 @@ public:
 
     shed(ofImage oriImg);
     ~shed();
-    void setup(); // set whell and lines (get a chance to adjust parameters before)
 
     void setupParameter();
 
     void setOriginalImgCrop();
     void setSketch();
     void setEmptyResult();
-    void setEmptyGridImg();
-    void initializeLines();
-    void destroyLine();
+
+
 
     void setBrushedImg();
     void initializeMask();
@@ -63,6 +61,7 @@ public:
 
 
     float lineScore(list<int *> l);
+    float lineScoreEquilibrate(list<int *> l);
     float lineScoreWeighByMaskFactor(list<int *> l);
     float lineScoreWeighByMaskFactorCumulative(list<int *> l);
     float lineScoreDelta(list<int *> l);
@@ -86,14 +85,14 @@ public:
     void drawWithBrushOnMask(int x, int y, float ** brushType, int sizeBrush);
     void computeBrushedImg();
 
-    void drawGridOnImg();
-
     void computeDiffOrignalResult();// differance between the result and the original (counting the lightness differance)
 
-    void setupWithExtraPins(std::list<ofVec2f>); // same as setup but use a whell with a central pin
-    void setupEllipse();
-    void setupSquare();
+    //void setupWithExtraPins(std::list<ofVec2f>); // same as setup but use a whell with a central pin
+    //void setupEllipse();
+    //void setupSquare();
 
+
+    void setupWheel(abstractWheel wel);
 };
 
 

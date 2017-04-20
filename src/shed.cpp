@@ -25,7 +25,6 @@ shed::shed(ofImage oriImg)
     setSketch();
     setBrushedImg();
 
-    setEmptyGridImg();
     initializeMask();
 
 
@@ -39,27 +38,15 @@ shed::shed(ofImage oriImg)
 
 }
 
-// differ the setup from the init to get a chance to adjust parameters :)
-void shed::setup(){
+void shed::setupWheel(abstractWheel wel){
 
-    // set wheel that contains pins position
-    ofVec2f centerWheel = ofVec2f( w/2 , w/2 );
-    float radius = (w-1)/2.0 ;    // we want not to be at border but inside
-
-    this->wel = wheel(numberPinsP, radius, centerWheel);
-
-    this->wel.randomifyslightlyPosition();
-
-    // set lines who represent all the strings possibilities betweens pins
-    initializeLines();
-
-
-    this->wel.drawPins();
-
-
+    this->wel = wel;
+    this->lines = wel.lines;
 }
 
 
+
+/*
 // here we use the grid with a number of manualy added pins
 // differ the setup from the init to get a chance to adjust parameters :)
 void shed::setupWithExtraPins(std::list<ofVec2f> extraPins){
@@ -78,6 +65,7 @@ void shed::setupWithExtraPins(std::list<ofVec2f> extraPins){
 
 
 }
+
 
 void shed::setupEllipse()
 {
@@ -119,12 +107,14 @@ void shed::setupSquare()
     this->wel.drawPins();
 
 }
+*/
 
 
 shed::~shed()
 {
+
+    wel.destroyLines();
     wel.deletePins();
-    destroyLine();
 }
 
 
@@ -134,7 +124,7 @@ void shed::setupParameter(){
 
     globalP.setName("Global Algorithm Parameters");
     globalP.add(numberPinsP.set("#pins",240, 4, 1200));
-    globalP.add(maxNumberStringP.set("max #strings", -1, -1, 20000) );
+    globalP.add(maxNumberStringP.set("max #strings", 30000, -1, 20000) );
 
     inFlyP.setName("In Fly Algorithm");
     inFlyP.add(algoOpacityP.set("algo opacity",9,0,255));
@@ -187,13 +177,6 @@ void shed::setEmptyResult()
     result.update();
 }
 
-void shed::setEmptyGridImg()
-{
-    gridImg.allocate(w, h , OF_IMAGE_COLOR);
-    gridImg.setColor(ofColor::white);
-    gridImg.update();
-
-}
 
 void shed::setBrushedImg()
 {
@@ -202,26 +185,7 @@ void shed::setBrushedImg()
 }
 
 
-/*
- * Draw the grid on gridImg
- */
-void shed::drawGridOnImg()
-{
 
-    list<int *> l;
-
-
-    for(int i = 0; i < wel.pinsNumber; i ++ ){
-        for(int j = 0; j < wel.pinsNumber; j++){
-
-            l = *(lines[i][j]);
-            drawer.decreasePixels(gridImg, l, ofColor(2,2,2));
-        }
-    }
-
-    gridImg.update();
-
-}
 
 void shed::computeDiffOrignalResult()
 {
@@ -259,53 +223,6 @@ void shed::initializeMask()
 }
 
 
-void shed::initializeLines(){
-
-    list<int*> * tempL;
-
-    // initializing lines
-    lines = new list<int*> * * [wel.pinsNumber];
-
-    for (int i = 0; i < wel.pinsNumber; i++) {
-        lines[i] = new list<int*> * [wel.pinsNumber];
-    }
-
-    for(int i = 0; i < wel.pinsNumber; i ++ ){
-        for(int j = 0; j < wel.pinsNumber; j++){
-
-            tempL = new list<int*>;
-            lines[i][j] = tempL;
-
-            if ( i != j){
-                drawer.getPixelIdxOfALineDDAAlgo(tempL, sketchImg, wel.pins[i], wel.pins[j]);
-            }
-
-        }
-
-    }
-}
-
-void shed::destroyLine(){
-
-    // FIXME half the first time work correctly but not the second ???
-
-    list<int * > * tempL;
-
-    for( int x = 0; x < wel.pinsNumber; x++)
-    {
-        for( int y= 0; y < wel.pinsNumber; y++){
-            tempL = lines[x][y];
-            drawer.freeListOf2Int(tempL);
-            delete tempL;
-        }
-    }
-
-    for (int i = 0; i < wel.pinsNumber; i++ ){ // is it correct ? needed?
-         delete[] lines[i] ;
-    }
-    delete[] lines;
-
-}
 
 
 
@@ -321,7 +238,17 @@ void shed::decreaseDarkness(list<int*> l, float decreasingV) {
 }
 
 
-// return the lightness score adaptation of the pixel contain in l
+/*
+ * Calculate the score of the line based on the darkness
+ * More the line is dark on the sketch image, more the score is high
+ *
+ * math: sum of the darkness / #pixel
+ *
+ * arg: list of pixel in the line
+ * return: the score as float
+ *
+ *
+*/
 float shed::lineScore( list<int*> l){
 
     ofColor color;
@@ -344,6 +271,47 @@ float shed::lineScore( list<int*> l){
     return score;
 
 }
+
+
+
+
+
+// Same as line score, but we shift the darkness to have negative value if the pixel is totaly white
+float shed::lineScoreEquilibrate( list<int*> l){
+
+    ofColor color;
+    float lightness;
+
+    int numberOfPixel = 0;
+    float score = 0;
+    float tempScore = 0;
+
+    for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++)
+    {
+        color = sketchImg.getColor( (*it)[0], (*it)[1] );
+        lightness = color.getLightness();
+
+        tempScore =  ( color.limit() - lightness) -  (color.limit() / 3 ) ;
+        score =  score   + tempScore ;
+
+        numberOfPixel = numberOfPixel + 1;
+
+    }
+
+    score = score / (float) numberOfPixel; // to not advantage long line
+
+    return score;
+
+}
+
+
+
+
+
+
+
+
+
 
 float shed::lineScoreDelta( list<int*> l){
 
@@ -468,7 +436,7 @@ int shed::findNextBestPin(int pinIdx){
 
     for( int i = 0; i < wel.pinsNumber; i++){
         tempIdx = ( i + pinIdx) % wel.pinsNumber;
-        tempScore = lineScoreWeighByMaskFactor(*(lines[pinIdx][tempIdx]));
+        tempScore = lineScoreEquilibrate(*(lines[pinIdx][tempIdx]));
 
 
         if (tempScore > bestScore){

@@ -3,31 +3,57 @@
 
 
 #include "ofMain.h"
+#include "imagedrawer.h"
 
-
-class wheel
+class abstractWheel
 {
 public:
 
     int pinsNumber;
-    float radius;
-    ofVec2f center;
+    int w; // width of the grid
+    int h;  // high of the grid
+    imageDrawer drawer; // utility to draw image
+
     ofVec2f* pins; // array name are pointers
-    ofImage representation;
+    list<int*> * ** lines; // all lines between all pins
+    ofImage pinsRepresentation;
+    ofImage gridRepresentation;
 
+    virtual void generatePins();
 
-    wheel( int pinsNumber=8, float radius=100, ofVec2f center=ofVec2f(0,0) );
-
-    void generatePins();
     void deletePins();
     void drawPins();
+    void drawGridRepresentation();
     void randomifyslightlyPosition(); // try to avoid morrié effect
+    void initializeLines();
+    void destroyLines();
+
+    void setup();
+    void setupWithRandomification();
+
+    abstractWheel(int pinsNumber = 8, int w = 100 , int h =100);
+
+};
+
+
+class wheelCircle: public  abstractWheel {
+
+public:
+
+
+    float radius;
+    ofVec2f center;
+
+    wheelCircle( int pinsNumber, int w , int h  ) ;
+    void generatePins();
+
 
 };
 
 
 
-class wheelFromPolyLine: public wheel {
+
+class wheelFromPolyLine: public  abstractWheel {
 
 public:
     ofPolyline polyline;
@@ -39,13 +65,10 @@ public:
 
 
 
-
-
-
 /*
  *This class take  a list of ofVec and add pins from it
  */
-class wheelExtra: public wheel
+class wheelExtra: public  abstractWheel
 {
 
 public:
@@ -58,8 +81,8 @@ public:
 
 /*
  * This class a bretton flower
- * */
-class wheelTribal : public wheel
+ */
+class wheelTribal : public  abstractWheel
 {
 
 public:
