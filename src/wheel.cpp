@@ -21,6 +21,18 @@ void abstractWheel::setupWithRandomification()
 
 }
 
+void abstractWheel::writePinPositionsToFile(string absolutFn)
+{
+
+    std::ofstream output(absolutFn);
+    assert(output.is_open());
+
+    for (int i = 0; i < pinsNumber; i++){
+        output << (pins[i]).x << "," << (pins[i]).y << std::endl;
+    }
+    output.close();
+}
+
 void abstractWheel::destroy()
 {
     this->destroyLines();
@@ -432,5 +444,70 @@ wheelCircle::wheelCircle( int pinsNumber, int w, int h)
 
      this->generatePins();
 
+
+ }
+
+ wheelFromFile::wheelFromFile(string filename, int w, int h)
+ {
+     this->filename = filename;
+
+     this->w = w;
+     this->h = h;
+
+     int numberOfLine = 0;
+     string line;
+
+     std::ifstream input(filename);
+     assert(input.is_open());
+
+     while (! input.eof())
+     {
+        std::getline(input, line);
+        if (line != ""){
+            numberOfLine++;
+        }
+
+     }
+     input.close();
+
+     pinsNumber = numberOfLine;
+     pins = new ofVec2f[pinsNumber];
+
+     this->generatePins();
+
+ }
+
+
+ void wheelFromFile::generatePins()
+ {
+
+     std::ifstream input(filename);
+     assert(input.is_open());
+
+
+
+     int i = 0;
+     string v1;
+     string v2;
+
+     float f1;
+     float f2;
+
+     while (! input.eof() )
+     {
+        std::getline(input, v1, ',');
+        std::getline(input, v2 );
+
+        if (v1 != "" and v2  != "") {
+
+             f1 = std::strtof(v1.c_str(), 0);
+             f2 = std::strtof(v2.c_str(), 0);
+
+             pins[i] = ofVec2f(f1,f2);
+             i++;
+
+        }
+     }
+     input.close();
 
  }

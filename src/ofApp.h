@@ -35,6 +35,7 @@ public:
 
 
     string outputFolder;
+    string pinPositionsSaverFn; // where the position of pins are saved in case of save
     ofParameter<bool> saveOption;
     string imageFn;
     ofImage pic;

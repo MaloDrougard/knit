@@ -13,6 +13,10 @@ void ofApp::setup(){
     pic.load("/home/makem/Cours/knitProject/inputPics/" + imageFn + ".jpg");
     pic.setImageType(OF_IMAGE_COLOR);
 
+
+   pinPositionsSaverFn = outputFolder + "pinPositions.dat";
+
+
     workshop = new shed(pic);
 
     numberOfCall = 0;
@@ -71,9 +75,9 @@ void ofApp::setup(){
     guiGrid.setSize(guiGridWidth, 100);
     guiGrid.setName("Grid parameters");
     guiGrid.add(numberOfPins.set("#pins", 240, 4, 720));
-    guiGrid.add(typeWheelInfo.setup("", "1=circle, 2=square, 3=tribal, 4=extra"));
+    guiGrid.add(typeWheelInfo.setup("", "1=circle,2=square,3=tribal,4=extra,5=file"));
     typeWheelInfo.setSize(guiGridWidth, typeWheelInfo.getHeight());
-    guiGrid.add(typeOfWheel.set("type of grid",1,1,4));
+    guiGrid.add(typeOfWheel.set("type of grid",1,1,5));
     guiGrid.add(randomifySlightlyPinPositions.set("randomify slightly pin positions", true));
     guiGrid.add(gridValidationBtn.setup("Validtate grid"));
 
@@ -363,6 +367,8 @@ void ofApp::gridValidation()
                     break;
             case 4: this->wel = wheelExtra(numberOfPins, w, h, extraPins);
                     break;
+            case 5: this->wel = wheelFromFile(pinPositionsSaverFn, w, h);
+                break;
         }
 
         numberOfPins = this->wel.pinsNumber; // in some case the number of pins change during the implementation of the whell
@@ -374,6 +380,7 @@ void ofApp::gridValidation()
         }
 
         this->workshop->setupWheel(this->wel);
+        this->wel.writePinPositionsToFile(pinPositionsSaverFn);
 
 
 

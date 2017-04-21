@@ -33,6 +33,8 @@ public:
     void setup();
     void setupWithRandomification();
 
+    void writePinPositionsToFile(string absolutFn);
+
     void destroy();
 
     abstractWheel(int pinsNumber = 8, int w = 100 , int h =100);
@@ -76,7 +78,14 @@ public:
 
 
 
+class wheelFromFile: public abstractWheel {
 
+public:
+    string filename;
+    wheelFromFile(string filename, int w, int h);
+    void generatePins();
+
+};
 
 
 
