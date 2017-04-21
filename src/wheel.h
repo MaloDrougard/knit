@@ -5,6 +5,8 @@
 #include "ofMain.h"
 #include "imagedrawer.h"
 
+
+// Base class for all wheel
 class abstractWheel
 {
 public:
@@ -31,9 +33,12 @@ public:
     void setup();
     void setupWithRandomification();
 
+    void destroy();
+
     abstractWheel(int pinsNumber = 8, int w = 100 , int h =100);
 
 };
+
 
 
 class wheelCircle: public  abstractWheel {
@@ -52,12 +57,42 @@ public:
 
 
 
-
 class wheelFromPolyLine: public  abstractWheel {
 
 public:
     ofPolyline polyline;
-    wheelFromPolyLine(int pinsNumber, ofPolyline poly);
+    wheelFromPolyLine(int pinsNumber = 8, ofPolyline poly = ofPolyline());
+    void generatePins();
+
+};
+
+
+class wheelSquare: public wheelFromPolyLine {
+
+public:
+    wheelSquare(int pinsNumber, int w = 100);
+
+};
+
+
+
+
+
+
+
+
+
+// Same as wheelCircle but add pins passed as parameters
+class wheelExtra: public  abstractWheel
+{
+
+public:
+
+    float radius;
+    ofVec2f center;
+    list<ofVec2f> extraPins;
+
+    wheelExtra( int pinsNumber, int w, int h,  std::list<ofVec2f> extraPins);
     void generatePins();
 
 };
@@ -65,28 +100,21 @@ public:
 
 
 
-/*
- *This class take  a list of ofVec and add pins from it
- */
-class wheelExtra: public  abstractWheel
-{
-
-public:
-    list<ofVec2f> extraPins;
-    wheelExtra( int pinsNumber, float radius, ofVec2f center, std::list<ofVec2f> extraPins );
-    void generatePins(); 
-
-};
 
 
-/*
- * This class a bretton flower
- */
+
+
+
+// This class a bretton flower
+
 class wheelTribal : public  abstractWheel
 {
 
 public:
-    wheelTribal( int pinsNumber=8, float radius=100, ofVec2f center=ofVec2f(0,0) );
+    float radius;
+    ofVec2f center;
+
+    wheelTribal(int pinsNumber=8, int w=100, int h=100 );
     void generatePins();
 
 };

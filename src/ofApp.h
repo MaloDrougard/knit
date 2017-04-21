@@ -85,9 +85,11 @@ public:
 
 
     ofxPanel guiGrid;
-    ofParameterGroup wheelParameters;
+
     ofParameter<int> numberOfPins;
+    ofxLabel typeWheelInfo;
     ofParameter<int> typeOfWheel;
+    ofParameter<bool> randomifySlightlyPinPositions;
     ofxButton gridValidationBtn;
 
     abstractWheel wel;

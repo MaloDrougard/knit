@@ -94,7 +94,7 @@ void imageDrawer::getPixelIdxOfALineDDAAlgo(list<int*> * l, ofVec2f l1, ofVec2f 
 void imageDrawer::freeListOf2Int(list<int *> * l )
 {
     for(std::list<int *>::iterator it = l->begin(); it  != l->end(); it++){
-        delete[] *it;
+        delete[] (*it);
     }
     l->clear();
 

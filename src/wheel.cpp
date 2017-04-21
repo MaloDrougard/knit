@@ -10,6 +10,7 @@ abstractWheel::abstractWheel(int pinsNumber , int w , int h )
 
     drawer = imageDrawer();
 
+    this->generatePins();
 }
 
 
@@ -19,6 +20,13 @@ void abstractWheel::setupWithRandomification()
     this->initializeLines();
 
 }
+
+void abstractWheel::destroy()
+{
+    this->destroyLines();
+    this->deletePins();
+}
+
 
 void abstractWheel::setup(){
 
@@ -33,7 +41,6 @@ void abstractWheel::generatePins()
        pins[i] = ofVec2f(0,0);
     }
 }
-
 
 
 void abstractWheel::initializeLines(){
@@ -62,6 +69,7 @@ void abstractWheel::initializeLines(){
     }
 }
 
+
 void abstractWheel::destroyLines(){
 
     // FIXME half the first time work correctly but not the second ???
@@ -82,19 +90,18 @@ void abstractWheel::destroyLines(){
     for (int i = 0; i < pinsNumber; i++ ){ // is it correct ? needed?
          delete[] lines[i] ;
     }
-    delete[] lines;
+
+    delete [] lines;
+
+
 
 }
-
-
 
 
 void abstractWheel::deletePins()
 {
      delete[] pins;
 }
-
-
 
 
 // move the position of the pins of one pixel
@@ -136,8 +143,6 @@ void abstractWheel::randomifyslightlyPosition()
 }
 
 
-
-
 void abstractWheel::drawPins()
 {
     pinsRepresentation.allocate(this->w, this->h, OF_IMAGE_COLOR);
@@ -167,7 +172,6 @@ void abstractWheel::drawPins()
 }
 
 
-
 void abstractWheel::drawGridRepresentation()
 {
 
@@ -188,10 +192,8 @@ void abstractWheel::drawGridRepresentation()
 }
 
 
-
 wheelCircle::wheelCircle( int pinsNumber, int w, int h)
 {
-
 
     this->pinsNumber = pinsNumber;
     this->w = w;
@@ -208,7 +210,6 @@ wheelCircle::wheelCircle( int pinsNumber, int w, int h)
 }
 
 
-// generate the position of pins in the image axis
  void wheelCircle::generatePins(){
 
      float angleIncrement = (2 * M_PI) / pinsNumber;
@@ -224,16 +225,21 @@ wheelCircle::wheelCircle( int pinsNumber, int w, int h)
 
  }
 
-/*
 
- wheelExtra::wheelExtra(int pinsNumber, float radius, ofVec2f center, std::list<ofVec2f> extraPins)
+
+ wheelExtra::wheelExtra(int pinsNumber, int w, int h, std::list<ofVec2f> extraPins)
  {
      this->extraPins = extraPins;
      this->pinsNumber = pinsNumber + extraPins.size() ; // we allow memory for the center pin
      this->pins = new ofVec2f[this->pinsNumber];
-     this->radius = radius;
-     this->center = center;
 
+     this->w = w;
+     this->h = h;
+
+     this->radius = (w/2.0) - 1;
+     this->center =ofVec2f(w/2.0, h/2.0);
+
+     drawer = imageDrawer();
 
      this->generatePins();
  }
@@ -264,13 +270,20 @@ wheelCircle::wheelCircle( int pinsNumber, int w, int h)
 
  }
 
- wheelTribal::wheelTribal(int pinsNumber, float radius, ofVec2f center)
+
+
+ wheelTribal::wheelTribal(int pinsNumber, int w, int h)
  {
      this->pinsNumber = (2 * pinsNumber) ; // we allow memory for the center pin
      this->pins = new ofVec2f[this->pinsNumber];
-     this->radius = radius;
-     this->center = center;
-     this->representation = ofImage();
+
+     this->w = w;
+     this->h = h;
+
+     this->radius = (w/2.0) - 1;
+     this->center =ofVec2f(w/2.0, h/2.0);
+
+     drawer = imageDrawer();
 
      this->generatePins();
  }
@@ -363,7 +376,7 @@ wheelCircle::wheelCircle( int pinsNumber, int w, int h)
      this->polyline = poly.getResampledByCount(pinsNumber);     // force the polyline to have the correct number of points
 
      ofRectangle tempRect = polyline.getBoundingBox();
-     this->center = tempRect.getCenter();
+
 
 
      if (tempRect.getHeight() > tempRect.getWidth() ) {
@@ -375,6 +388,8 @@ wheelCircle::wheelCircle( int pinsNumber, int w, int h)
      }
 
      this->pins = new ofVec2f[pinsNumber];
+
+     drawer = imageDrawer();
 
      this->generatePins();
 
@@ -393,5 +408,29 @@ wheelCircle::wheelCircle( int pinsNumber, int w, int h)
     }
 
  }
-*/
 
+
+
+ wheelSquare::wheelSquare(int pinsNumber, int w)
+ {
+
+     this->pinsNumber = pinsNumber;
+     this->w = w;
+     this->h = w;
+
+     polyline.addVertex(ofVec2f(0,0));
+     polyline.lineTo(ofVec2f((w -1),0));
+     polyline.lineTo(ofVec2f((w-1),(h-1)));
+     polyline.lineTo(ofVec2f(0,(h-1)));
+     polyline.lineTo(ofVec2f(0,0));
+
+     polyline = polyline.getResampledByCount(pinsNumber);     // force the polyline to have the correct number of points
+
+     this->pins = new ofVec2f[pinsNumber];
+
+     drawer = imageDrawer();
+
+     this->generatePins();
+
+
+ }

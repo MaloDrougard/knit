@@ -66,14 +66,23 @@ void ofApp::setup(){
 
     setupBrush();
 
-
-    wheelParameters.setName("Grid paramters");
-    wheelParameters.add(numberOfPins.set("#pins", 240, 4, 720));
-    wheelParameters.add(typeOfWheel.set("Type of wheel", 1,1,4));
-    guiGrid.setup(wheelParameters);
+    int guiGridWidth = 300;
+    guiGrid.setup();
+    guiGrid.setSize(guiGridWidth, 100);
+    guiGrid.setName("Grid parameters");
+    guiGrid.add(numberOfPins.set("#pins", 240, 4, 720));
+    guiGrid.add(typeWheelInfo.setup("", "1=circle, 2=square, 3=tribal, 4=extra"));
+    typeWheelInfo.setSize(guiGridWidth, typeWheelInfo.getHeight());
+    guiGrid.add(typeOfWheel.set("type of grid",1,1,4));
+    guiGrid.add(randomifySlightlyPinPositions.set("randomify slightly pin positions", true));
     guiGrid.add(gridValidationBtn.setup("Validtate grid"));
 
     gridValidationBtn.addListener(this, &ofApp::gridValidation);
+
+    guiGrid.setPosition(20, workshop->h);
+
+    wel = wheelCircle(numberOfPins, workshop->w, workshop->h);
+    wel.setup();
 
 
 
@@ -339,12 +348,34 @@ void ofApp::onMousePressedInZoneA(ofVec2f & relPos)
 void ofApp::gridValidation()
 {
 
-        int w = workshop->w;
+        this->wel.destroy();
 
-        this->wel = wheelCircle(numberOfPins, w, w);
-        this->wel.setupWithRandomification();
+        int w = workshop->w;
+        int h = workshop->h;
+
+        switch (typeOfWheel){
+
+            case 1: this->wel = wheelCircle(numberOfPins, w ,h );
+                    break;
+            case 2: this->wel = wheelSquare(numberOfPins, w);
+                    break;
+            case 3: this->wel = wheelTribal(numberOfPins, w, h);
+                    break;
+            case 4: this->wel = wheelExtra(numberOfPins, w, h, extraPins);
+                    break;
+        }
+
+        numberOfPins = this->wel.pinsNumber; // in some case the number of pins change during the implementation of the whell
+
+        if (randomifySlightlyPinPositions){
+            this->wel.setupWithRandomification();
+        } else {
+            this->wel.setup();
+        }
 
         this->workshop->setupWheel(this->wel);
+
+
 
 
 }

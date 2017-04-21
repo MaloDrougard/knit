@@ -46,69 +46,6 @@ void shed::setupWheel(abstractWheel wel){
 
 
 
-/*
-// here we use the grid with a number of manualy added pins
-// differ the setup from the init to get a chance to adjust parameters :)
-void shed::setupWithExtraPins(std::list<ofVec2f> extraPins){
-
-    // set wheel that contains pins position
-    ofVec2f centerWheel = ofVec2f( w/2 , w/2 );
-    float radius = (w-1)/2.0 ;    // we want not to be at border but inside
-
-    this->wel = wheelExtra(numberPinsP, radius, centerWheel, extraPins);
-    // set lines who represent all the strings possibilities betweens pins
-
-    initializeLines();
-
-    this->wel.drawPins();
-
-
-
-}
-
-
-void shed::setupEllipse()
-{
-    ofPolyline polyline1, polyline2;
-
-    // draw an circle with a diameter of 100 in blue
-    ofPoint point1(w/2,w/2);
-    float radiusX =0.75 * (w/2);
-    float radiusY = w/2;
-    polyline1.arc(point1 , radiusX, radiusY, 0 , 360);
-    polyline2 = polyline1.getResampledByCount(numberPinsP);
-
-    this->wel = wheelFromPolyLine(numberPinsP,polyline2);
-
-    // set lines who represent all the strings possibilities betweens pins
-    initializeLines();
-
-
-    this->wel.drawPins();
-
-}
-
-void shed::setupSquare()
-{
-    ofPolyline polyline1;
-
-    polyline1.addVertex(ofVec2f(0,0));
-    polyline1.lineTo(ofVec2f((w -1),0));
-    polyline1.lineTo(ofVec2f((w-1),(h-1)));
-    polyline1.lineTo(ofVec2f(0,(h-1)));
-    polyline1.lineTo(ofVec2f(0,0));
-
-    this->wel = wheelFromPolyLine(numberPinsP,polyline1);
-
-    // set lines who represent all the strings possibilities betweens pins
-    initializeLines();
-
-
-    this->wel.drawPins();
-
-}
-*/
-
 
 shed::~shed()
 {
