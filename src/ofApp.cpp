@@ -4,7 +4,7 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
-    saveOption = true;
+    saveOption = false;
     extraPins =  std::list<ofVec2f> ();
 
 
@@ -14,8 +14,8 @@ void ofApp::setup(){
     pic.setImageType(OF_IMAGE_COLOR);
 
 
-   pinPositionsSaverFn = outputFolder + "pinPositions.dat";
-
+    pinPositionsSaverFn = outputFolder + "pinPositions.dat";
+    pinPositionsInputFn = outputFolder + "inputPinPositions.dat";
 
     workshop = new shed(pic);
 
@@ -36,6 +36,7 @@ void ofApp::setup(){
     guiAlgo.setup(allParameters);
     guiAlgo.add(startBtn.setup("Start"));
 
+    guiAlgo.add(launchScript.setup("Lauch background script"));
 
 
     leftImgParameters.setName("Left image interface");
@@ -67,6 +68,7 @@ void ofApp::setup(){
 
     saveImagesBtn.addListener(this, &ofApp::onSaveImagesPressed);
     startBtn.addListener(this, &ofApp::onStartPressed );
+    launchScript.addListener(this, &ofApp::runScript );
 
     setupBrush();
 
@@ -77,20 +79,16 @@ void ofApp::setup(){
     guiGrid.add(numberOfPins.set("#pins", 240, 4, 720));
     guiGrid.add(typeWheelInfo.setup("", "1=circle,2=square,3=tribal,4=extra,5=file"));
     typeWheelInfo.setSize(guiGridWidth, typeWheelInfo.getHeight());
-    guiGrid.add(typeOfWheel.set("type of grid",1,1,5));
-    guiGrid.add(randomifySlightlyPinPositions.set("randomify slightly pin positions", true));
+    guiGrid.add(typeOfWheel.set("type of grid",5,1,5));
+    guiGrid.add(randomifySlightlyPinPositions.set("randomify slightly pin positions", false));
     guiGrid.add(gridValidationBtn.setup("Validtate grid"));
 
     gridValidationBtn.addListener(this, &ofApp::gridValidation);
 
-    guiGrid.setPosition(20, workshop->h);
+    guiGrid.setPosition(260, 20);
 
     wel = wheelCircle(numberOfPins, workshop->w, workshop->h);
     wel.setup();
-
-
-
-
 
 }
 
@@ -339,6 +337,13 @@ void ofApp::onSaveImagesPressed()
 
 }
 
+void ofApp::runScript()
+{
+    scriptUtility s = scriptUtility();
+    s.run();
+
+}
+
 void ofApp::onMousePressedInZoneA(ofVec2f & relPos)
 {
     if( pinsSettingsMode)
@@ -367,7 +372,7 @@ void ofApp::gridValidation()
                     break;
             case 4: this->wel = wheelExtra(numberOfPins, w, h, extraPins);
                     break;
-            case 5: this->wel = wheelFromFile(pinPositionsSaverFn, w, h);
+            case 5: this->wel = wheelFromFile(pinPositionsInputFn, w, h);
                 break;
         }
 

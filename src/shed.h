@@ -9,6 +9,8 @@ class shed
 {
 public:
 
+    shed(ofImage oriImg);
+
     int w ; // width of the image we use
     int h ; // height of the image we use
 
@@ -43,9 +45,6 @@ public:
     list<int*> * ** lines;
     list<int> stringPath;
 
-    shed(ofImage oriImg);
-    ~shed();
-
     void setupParameter();
 
     void setOriginalImgCrop();
@@ -62,9 +61,11 @@ public:
 
     float lineScore(list<int *> l);
     float lineScoreEquilibrate(list<int *> l);
+    float lineScoreWeightedExtremity(list<int *> l);
     float lineScoreWeighByMaskFactor(list<int *> l);
     float lineScoreWeighByMaskFactorCumulative(list<int *> l);
     float lineScoreDelta(list<int *> l);
+    float lineScoreSignedDifferenceBetweenOriginalAndResult(list<int *> l);
 
     int findNextBestPin(int pinIdx);
 
@@ -93,6 +94,7 @@ public:
 
 
     void setupWheel(abstractWheel wel);
+
 };
 
 

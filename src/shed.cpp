@@ -47,21 +47,13 @@ void shed::setupWheel(abstractWheel wel){
 
 
 
-shed::~shed()
-{
-
-    wel.destroyLines();
-    wel.deletePins();
-}
-
-
 void shed::setupParameter(){
 
     // divide setup in start ans onFly
 
     globalP.setName("Global Algorithm Parameters");
     globalP.add(numberPinsP.set("#pins",240, 4, 1200));
-    globalP.add(maxNumberStringP.set("max #strings", 30000, -1, 20000) );
+    globalP.add(maxNumberStringP.set("max #strings", 30003, -1, 20000) );
 
     inFlyP.setName("In Fly Algorithm");
     inFlyP.add(algoOpacityP.set("algo opacity",9,0,255));
@@ -212,6 +204,85 @@ float shed::lineScore( list<int*> l){
 
 
 
+/*
+
+*/
+float shed::lineScoreSignedDifferenceBetweenOriginalAndResult( list<int*> l){
+
+    ofColor colorOri;
+    ofColor colorRes;
+
+    float darknessOri;
+    float darknessRes;
+
+    int numberOfPixel = 0;
+    float tempScore = 0;
+    float score = 0;
+
+    for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++)
+    {
+        colorOri = originalImgCrop.getColor( (*it)[0], (*it)[1] );
+        colorRes = result.getColor((*it)[0], (*it)[1] );
+
+        darknessOri = colorOri.limit() - colorOri.getLightness();
+        darknessRes = colorRes.limit() - colorRes.getLightness();
+
+        tempScore = darknessOri - darknessRes;
+        score += tempScore;
+        numberOfPixel = numberOfPixel + 1;
+
+    }
+
+    score = score / (float) numberOfPixel; // to not advantage long line
+
+    return score;
+
+}
+
+
+
+
+
+
+
+float shed::lineScoreWeightedExtremity( list<int*> l){
+
+    ofColor color;
+    float lightness;
+
+    int numberOfPixel = 0;
+    float score = 0;
+    float tempScore = 0;
+    float tempFactor = 0;
+    float maxFactor = 3;
+
+    for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++)
+    {
+        color = sketchImg.getColor( (*it)[0], (*it)[1] );
+        lightness = color.getLightness();
+
+        tempScore =  ( color.limit() - lightness) -  (color.limit() / 2) ;
+
+        tempFactor = abs(tempScore);
+        tempFactor = 1/(color.limit() / 2 ) * tempFactor;
+        tempFactor = pow(maxFactor, tempFactor);
+        tempScore = tempScore * tempFactor;
+
+
+        score =  score   + tempScore ;
+
+        numberOfPixel = numberOfPixel + 1;
+
+    }
+
+    score = score / (float) numberOfPixel; // to not advantage long line
+
+    return score;
+
+}
+
+
+
 
 // Same as line score, but we shift the darkness to have negative value if the pixel is totaly white
 float shed::lineScoreEquilibrate( list<int*> l){
@@ -240,13 +311,6 @@ float shed::lineScoreEquilibrate( list<int*> l){
     return score;
 
 }
-
-
-
-
-
-
-
 
 
 
@@ -373,7 +437,7 @@ int shed::findNextBestPin(int pinIdx){
 
     for( int i = 0; i < wel.pinsNumber; i++){
         tempIdx = ( i + pinIdx) % wel.pinsNumber;
-        tempScore = lineScoreEquilibrate(*(lines[pinIdx][tempIdx]));
+        tempScore = lineScoreSignedDifferenceBetweenOriginalAndResult(*(lines[pinIdx][tempIdx]));
 
 
         if (tempScore > bestScore){

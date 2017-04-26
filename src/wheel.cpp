@@ -21,6 +21,13 @@ void abstractWheel::setupWithRandomification()
 
 }
 
+
+void abstractWheel::setup(){
+
+    this->initializeLines();
+}
+
+
 void abstractWheel::writePinPositionsToFile(string absolutFn)
 {
 
@@ -39,11 +46,6 @@ void abstractWheel::destroy()
     this->deletePins();
 }
 
-
-void abstractWheel::setup(){
-
-    this->initializeLines();
-}
 
 
 void abstractWheel::generatePins()

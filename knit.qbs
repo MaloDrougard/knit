@@ -19,6 +19,8 @@ Project{
             "src/main.cpp",
             "src/ofApp.cpp",
             "src/ofApp.h",
+            "src/scriptutility.cpp",
+            "src/scriptutility.h",
             "src/shed.cpp",
             "src/shed.h",
             "src/wheel.cpp",

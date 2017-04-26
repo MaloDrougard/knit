@@ -9,7 +9,7 @@
 #include "imagedrawer.h"
 #include "shed.h"
 #include "zone.h"
-
+#include "scriptutility.h"
 
 
 #include "ofxGui.h"
@@ -22,6 +22,7 @@ public:
     ofParameter<bool> oneRandom ;
     ofParameter<bool> stopAlgo;
     ofxButton startBtn;
+    ofxButton launchScript;
 
 
 
@@ -36,6 +37,7 @@ public:
 
     string outputFolder;
     string pinPositionsSaverFn; // where the position of pins are saved in case of save
+    string pinPositionsInputFn; // where the wheelFromFile read is file
     ofParameter<bool> saveOption;
     string imageFn;
     ofImage pic;
@@ -79,6 +81,9 @@ public:
 
     void onSaveImagesPressed();
 
+    void runScript();
+
+
     // for pins settings
     ofParameter<bool> pinsSettingsMode;
     std::list<ofVec2f> extraPins;
@@ -94,6 +99,7 @@ public:
     ofxButton gridValidationBtn;
 
     abstractWheel wel;
+
 
     void gridValidation();
 
