@@ -13,7 +13,7 @@ void scriptUtility::run()
 
     //pics settings
     string outputFolder = "/home/makem/Cours/knitProject/outputPics/";
-    string imagesFn [7] = { "abstract1", "city1", "dance1", "elgreco1", "starik1", "tree3", "tree4"};
+    string imagesFn [7] =  { "abstract1", "city1", "dance1", "elgreco1", "starik1", "tree3", "tree4"};
     int imagesFnSize = 7;
 
 
@@ -71,7 +71,7 @@ string scriptUtility::getSavingName(shed workshop, string imageFn)
                     + "-p:"+ std::to_string(workshop.numberPinsP)
                     + "-ao:" + std::to_string(workshop.algoOpacityP)
                     + "-do:" + std::to_string(workshop.drawOpacityP)
-                    + "-sf:" + "diffOriResult"
+                    + "-sf:" + "wheigtedExtremity3"
                     + "-e:"+ std::to_string(workshop.diffError);
 
     string name =    std::string(buff)

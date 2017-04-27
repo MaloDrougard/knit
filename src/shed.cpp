@@ -247,8 +247,11 @@ float shed::lineScoreSignedDifferenceBetweenOriginalAndResult( list<int*> l){
 
 float shed::lineScoreWeightedExtremity( list<int*> l){
 
-    ofColor color;
-    float lightness;
+    ofColor colorOri;
+    ofColor colorRes;
+
+    float darknessOri;
+    float darknessRes;
 
     int numberOfPixel = 0;
     float score = 0;
@@ -258,13 +261,17 @@ float shed::lineScoreWeightedExtremity( list<int*> l){
 
     for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++)
     {
-        color = sketchImg.getColor( (*it)[0], (*it)[1] );
-        lightness = color.getLightness();
 
-        tempScore =  ( color.limit() - lightness) -  (color.limit() / 2) ;
+        colorOri = originalImgCrop.getColor( (*it)[0], (*it)[1] );
+        colorRes = result.getColor((*it)[0], (*it)[1] );
+
+        darknessOri = colorOri.limit() - colorOri.getLightness();
+        darknessRes = colorRes.limit() - colorRes.getLightness();
+
+        tempScore = darknessOri - darknessRes;
 
         tempFactor = abs(tempScore);
-        tempFactor = 1/(color.limit() / 2 ) * tempFactor;
+        tempFactor = 1/(colorOri.limit()) * tempFactor;
         tempFactor = pow(maxFactor, tempFactor);
         tempScore = tempScore * tempFactor;
 
@@ -319,6 +326,9 @@ float shed::lineScoreDelta( list<int*> l){
     ofColor color1;
     ofColor color2;
 
+    ofColor colorOriTemp;
+    ofColor colorResTemp;
+
     float lightness1;
     float lightness2;
 
@@ -333,11 +343,15 @@ float shed::lineScoreDelta( list<int*> l){
 
     for (std::list<int * >::iterator it = l.begin(); next_it != l.end(); it++)
     {
-        color1 = sketchImg.getColor( (*it)[0], (*it)[1] );
-        lightness1 = color1.getLightness();
+        colorOriTemp = originalImgCrop.getColor( (*it)[0], (*it)[1] );
+        colorResTemp = result.getColor((*it)[0], (*it)[1] );
 
-        color2 = sketchImg.getColor( (*next_it)[0], (*next_it)[1] );
-        lightness2 = color2.getLightness();
+        lightness1 = colorOriTemp.getLightness() - colorResTemp.getLightness();
+
+        colorOriTemp = originalImgCrop.getColor( (*next_it)[0], (*next_it)[1] );
+        colorResTemp = result.getColor((*next_it)[0], (*next_it)[1] );
+
+        lightness2 = colorOriTemp.getLightness() - colorResTemp.getLightness();
 
         scoreTemp =  color1.limit() - abs(lightness1 - lightness2) ;  // 255 lightness is white
         score += scoreTemp;
@@ -437,7 +451,7 @@ int shed::findNextBestPin(int pinIdx){
 
     for( int i = 0; i < wel.pinsNumber; i++){
         tempIdx = ( i + pinIdx) % wel.pinsNumber;
-        tempScore = lineScoreSignedDifferenceBetweenOriginalAndResult(*(lines[pinIdx][tempIdx]));
+        tempScore = lineScoreWeightedExtremity(*(lines[pinIdx][tempIdx]));
 
 
         if (tempScore > bestScore){
