@@ -12,6 +12,8 @@ Project{
         name: { return FileInfo.baseName(path) }
 
         files: [
+            "src/colorshed.cpp",
+            "src/colorshed.h",
             "src/grid.cpp",
             "src/grid.h",
             "src/imagedrawer.cpp",

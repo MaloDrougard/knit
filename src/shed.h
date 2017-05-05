@@ -77,20 +77,12 @@ public:
 
 
     void decreaseDarkness(list<int *> l, float decreasingV);
-
-
-
     void drawStrings(); // deprecated
-
 
     void drawWithBrushOnMask(int x, int y, float ** brushType, int sizeBrush);
     void computeBrushedImg();
-
     void computeDiffOrignalResult();// differance between the result and the original (counting the lightness differance)
 
-    //void setupWithExtraPins(std::list<ofVec2f>); // same as setup but use a whell with a central pin
-    //void setupEllipse();
-    //void setupSquare();
 
 
     void setupWheel(abstractWheel wel);

@@ -193,5 +193,20 @@ void imageDrawer::decreasePixels(ofImage &img, list<int * > l, ofColor color)
 }
 
 
+void imageDrawer::increasePixels(ofImage &img, list<int * > l, ofColor color)
+{
+    ofColor tempColor;
+    for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++){
+
+        tempColor = img.getColor((*it)[0],  (*it)[1]);
+        tempColor = tempColor + color;
+        img.setColor((*it)[0],  (*it)[1], tempColor);
+    }
+
+    img.update();
+
+}
+
+
 
 

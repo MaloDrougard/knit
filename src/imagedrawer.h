@@ -25,8 +25,10 @@ public:
     void incrementPixels(ofImage &img, list<int *> l, ofColor color);
 
     void decreasePixels(ofImage &img, list<int *> l, ofColor color);
+    void increasePixels(ofImage &img, list<int *> l, ofColor color);
 
     void freeListOf2Int(list<int *> * l);
+
 };
 
 #endif // IMAGEDRAWER_H

@@ -10,6 +10,7 @@
 #include "shed.h"
 #include "zone.h"
 #include "scriptutility.h"
+#include "colorshed.h"
 
 
 #include "ofxGui.h"
@@ -41,7 +42,7 @@ public:
     ofParameter<bool> saveOption;
     string imageFn;
     ofImage pic;
-    shed * workshop;
+    colorShed * workshop;
     int numberOfCall;
 
     ofxPanel guiAlgo;
@@ -98,7 +99,7 @@ public:
     ofParameter<bool> randomifySlightlyPinPositions;
     ofxButton gridValidationBtn;
 
-    abstractWheel wel;
+    abstractWheel * wel;
 
 
     void gridValidation();
