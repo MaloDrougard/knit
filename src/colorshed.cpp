@@ -304,7 +304,7 @@ void colorShed::computeNextRedPinAndDrawOneString(){
         float decreaseV = 9;
         int opacity = 9;
 
-        nextPinIdxRed = findNextBestRedPin(currentPinIdxRed );
+        nextPinIdxRed = findNextBestPin(currentPinIdxRed, &colorShed::redLineScoreSignedDifferenceBetweenOriginalAndResult );
 
         // draw the line
         drawer.increasePixels(result, *(lines[currentPinIdxRed][nextPinIdxRed]), ofColor(opacity,0,0));
@@ -332,7 +332,7 @@ void colorShed::computeNextGreenPinAndDrawOneString(){
         float decreaseV = 9;
         int opacity = 9;
 
-        nextPinIdx1 = findNextBestGreenPin(currentPinIdxGreen);
+        nextPinIdx1 = findNextBestPin(currentPinIdxGreen, &colorShed::greenLineScoreSignedDifferenceBetweenOriginalAndResult );
 
         // draw the line
         drawer.increasePixels(result, *(lines[currentPinIdxGreen][nextPinIdx1]), ofColor(0,opacity,0));
@@ -361,7 +361,7 @@ void colorShed::computeNextBluePinAndDrawOneString(){
         float decreaseV = 9;
         int opacity = 9;
 
-        nextPinIdx1 = findNextBestBluePin(currentPinIdxBlue);
+        nextPinIdx1 = findNextBestPin(currentPinIdxBlue, &colorShed::blueLineScoreSignedDifferenceBetweenOriginalAndResult );
 
         // draw the line
         drawer.increasePixels(result, *(lines[currentPinIdxBlue][nextPinIdx1]), ofColor(0,0,opacity));
@@ -377,4 +377,43 @@ void colorShed::computeNextBluePinAndDrawOneString(){
         // update the pin
         currentPinIdxBlue = nextPinIdx1;
     }
+}
+
+
+
+int colorShed::findNextBestPin(int pinIdx, float (colorShed::*pScoreFunction)(list<int *>))
+{
+
+    float bestScore = INT_MIN;
+    float tempScore = 0;
+
+    int bestNextIdx = 0;
+    int tempIdx = 0;
+
+
+    for( int i = 0; i < wel.pinsNumber; i++){
+        tempIdx = ( i + pinIdx) % wel.pinsNumber;
+        tempScore = (this->*pScoreFunction)(*(lines[pinIdx][tempIdx]));
+
+
+        if (tempScore > bestScore){
+            bestScore = tempScore;
+            bestNextIdx = tempIdx;
+        }
+    }
+
+    return bestNextIdx;
+
+}
+
+
+substractiveColorShed::substractiveColorShed(ofImage inputImg): colorShed(inputImg)
+{
+
+}
+
+int substractiveColorShed::findNextBestPin(int pinIdx)
+{
+    std::cout << "overwrite " << std::endl;
+    return 2;
 }

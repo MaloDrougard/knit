@@ -58,7 +58,9 @@ public:
     float blueLineScoreSignedDifferenceBetweenOriginalAndResult(list<int *> l);
 
 
-    int findNextBestPin(int pinIdx);
+
+
+    virtual int findNextBestPin(int pinIdx, float (colorShed::*pScoreFunction)(list<int * > ));
 
     int findNextBestRedPin(int pinIdx);
     int findNextBestGreenPin(int pinIdx);
@@ -72,4 +74,38 @@ public:
 
 };
 
+
+class substractiveColorShed: public colorShed {
+
+public:
+
+    substractiveColorShed(ofImage inputImg);
+
+    int findNextBestPin(int pinIdx);
+
+
+
+
+};
+
+
+
+
+
+
+
+
+
+
 #endif // COLORSHED_H
+
+
+
+
+
+
+
+
+
+
+
