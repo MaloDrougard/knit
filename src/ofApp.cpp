@@ -11,7 +11,7 @@ void ofApp::setup(){
 
 
     outputFolder = "/home/makem/Cours/knitProject/outputPics/";
-    imageFn = "elgreco2";
+    imageFn = "abstract2";
     pic.load("/home/makem/Cours/knitProject/inputPics/" + imageFn + ".jpg");
     pic.setImageType(OF_IMAGE_COLOR);
 
@@ -19,7 +19,7 @@ void ofApp::setup(){
     pinPositionsSaverFn = outputFolder + "pinPositions.dat";
     pinPositionsInputFn = outputFolder + "inputPinPositions.dat";
 
-    workshop = new grayShed(pic, imageFn);
+    workshop = new substractiveColorShed(pic, imageFn);
 
     numberOfCall = 0;
     computeGridNeeded = true;
@@ -259,59 +259,16 @@ void ofApp::onMouseInZoneA( ofVec2f & relPos){
 void ofApp::onSaveImagesPressed()
 {
 
-/*
-    char buff[30];
-    time_t now = time(NULL);
-    strftime(buff, 30, "d:%Y%m%d-h:%H%M%S", localtime(&now));
-
-    string para =   "-n:" + imageFn
-                    + "-s:"+ std::to_string(workshop->stepsNumberP)
-                    + "-p:"+ std::to_string(workshop->numberPinsP)
-                    + "-ao:" + std::to_string(workshop->algoOpacityP)
-                    + "-do:" + std::to_string(workshop->drawOpacityP)
-                    + "-sf:" + "equilibrate"
-                    + "-e:"+ std::to_string(workshop->diffError);
-
-    string name =    std::string(buff)
-                    + "-i:result"
-                    + para
-                    + ".jpg";
-
-    workshop->result.save(outputFolder + name);
-    std::cout << "Image: " << name << " is saved in " << outputFolder << std::endl;
-
-    name =    std::string(buff)
-                    + "-i:sketch"
-                    + para
-                    + ".jpg";
-
-    workshop->sketchImg.save(outputFolder + name);
-    std::cout << "Image: " << name << " is saved in " << outputFolder << std::endl;
-
-
-
-    name =    std::string(buff)
-                    + "-i:originalcrop"
-                    + para
-                    + ".jpg";
-
-    workshop->originalImgCrop.save(outputFolder + name);
-    std::cout << "Image: " << name << " is saved in " << outputFolder << std::endl;
 
 
     if (computeGridNeeded){
-        wel->drawGridRepresentation();
-        computeGridNeeded = false;
+        // wel->drawGridRepresentation();
+        // computeGridNeeded = false;
      }
 
+    workshop->saveResultImage(outputFolder);
 
-    name =    std::string(buff)
-                    + "-i:grid"
-                    + para
-                    + ".jpg";
-    wel->gridRepresentation.save(outputFolder + name);
-    std::cout << "Image: " << name << " is saved in " << outputFolder << std::endl;
-*/
+
 
 }
 

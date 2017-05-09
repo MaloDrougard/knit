@@ -42,6 +42,10 @@ public:
     void setEmptyResult(ofColor backgroundColor);
     void setupWheel(abstractWheel wel);
 
+    virtual int saveResultImage(string folder);
+    string getBasicInfos();
+    virtual string getInfos();
+
     virtual void computeAndDrawOneStep();
 
     int computeLightnessAbsoluteError();// differance between the result and the original (counting the lightness differance)

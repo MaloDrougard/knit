@@ -3,7 +3,7 @@
 
 #include "ofMain.h"
 #include "grayshed.h"
-#include "wheel.h"
+#include "colorshed.h"
 
 
 class scriptUtility
@@ -12,7 +12,7 @@ public:
 
     scriptUtility();
     void run();
-    string getSavingName(genericShed *workshop, string imageFn);
+
 };
 
 #endif // SCRIPTUTILITY_H

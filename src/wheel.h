@@ -11,6 +11,7 @@ class abstractWheel
 {
 public:
 
+    string type;
     int pinsNumber;
     int w; // width of the grid
     int h;  // high of the grid
@@ -38,6 +39,10 @@ public:
     void destroy();
 
     abstractWheel(int pinsNumber = 8, int w = 100 , int h =100);
+
+    virtual  string getInfos(); // return a string that contains basic infos of the forme "
+
+
 
 };
 
@@ -105,10 +110,6 @@ public:
     void generatePins();
 
 };
-
-
-
-
 
 
 

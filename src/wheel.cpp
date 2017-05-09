@@ -3,6 +3,7 @@
 
 abstractWheel::abstractWheel(int pinsNumber , int w , int h )
 {
+    this->type = "abstract";
     this->pinsNumber = pinsNumber;
     this->pins = new ofVec2f[this->pinsNumber];
     this->w = w;
@@ -11,6 +12,12 @@ abstractWheel::abstractWheel(int pinsNumber , int w , int h )
     drawer = imageDrawer();
 
     this->generatePins();
+
+}
+
+string abstractWheel::getInfos()
+{
+    return  "-wt:" + type + "-wp:" + std::to_string(pinsNumber) ;
 }
 
 
@@ -209,6 +216,7 @@ void abstractWheel::drawGridRepresentation()
 wheelCircle::wheelCircle( int pinsNumber, int w, int h)
 {
 
+    this->type = "circle";
     this->pinsNumber = pinsNumber;
     this->w = w;
     this->h = h;
@@ -243,6 +251,7 @@ wheelCircle::wheelCircle( int pinsNumber, int w, int h)
 
  wheelExtra::wheelExtra(int pinsNumber, int w, int h, std::list<ofVec2f> extraPins)
  {
+     this->type = "extra";
      this->extraPins = extraPins;
      this->pinsNumber = pinsNumber + extraPins.size() ; // we allow memory for the center pin
      this->pins = new ofVec2f[this->pinsNumber];
@@ -288,6 +297,7 @@ wheelCircle::wheelCircle( int pinsNumber, int w, int h)
 
  wheelTribal::wheelTribal(int pinsNumber, int w, int h)
  {
+     this->type = "tribal";
      this->pinsNumber = (2 * pinsNumber) ; // we allow memory for the center pin
      this->pins = new ofVec2f[this->pinsNumber];
 
@@ -386,6 +396,7 @@ wheelCircle::wheelCircle( int pinsNumber, int w, int h)
 
  wheelFromPolyLine::wheelFromPolyLine(int pinsNumber, ofPolyline poly)
  {
+     this->type = "polyline";
      this->pinsNumber = pinsNumber;
      this->polyline = poly.getResampledByCount(pinsNumber);     // force the polyline to have the correct number of points
 
@@ -427,6 +438,7 @@ wheelCircle::wheelCircle( int pinsNumber, int w, int h)
 
  wheelSquare::wheelSquare(int pinsNumber, int w)
  {
+     this->type = "square";
 
      this->pinsNumber = pinsNumber;
      this->w = w;
@@ -451,6 +463,7 @@ wheelCircle::wheelCircle( int pinsNumber, int w, int h)
 
  wheelFromFile::wheelFromFile(string filename, int w, int h)
  {
+     this->type = "fromfile";
      this->filename = filename;
 
      this->w = w;

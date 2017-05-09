@@ -79,6 +79,46 @@ void genericShed::setupWheel(abstractWheel wel)
     this->wel = wel;
 }
 
+string genericShed::getBasicInfos()
+{
+    this->computeLightnessAbsoluteError();
+
+    string para =   "-si:" + imageName    // image name
+                    + "-ss:" + std::to_string(stepsNumberP)  // steps number
+                    + "-st:" + type     // shed type
+                    + "-so:" + std::to_string(drawOpacityP)
+                    + "-se:"+ std::to_string(lightnessAbsoluteError);
+    return para;
+
+}
+
+string genericShed::getInfos()
+{
+    return getBasicInfos();
+}
+
+
+int genericShed::saveResultImage(string folder)
+{
+
+    char buff[30];
+    time_t now = time(NULL);
+    strftime(buff, 30, "d:%Y%m%d-h:%H%M%S", localtime(&now));
+
+    string para =   getInfos()
+                    + wel.getInfos();
+
+    string name =    std::string(buff)
+                    + para
+                    + ".jpg";
+
+
+    result.save(folder + name);
+    std::cout << "result image saved in: " << folder + name << std::endl;
+
+    return 1;
+}
+
 
 void genericShed::computeAndDrawOneStep()
 {
