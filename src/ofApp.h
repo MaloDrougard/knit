@@ -7,10 +7,11 @@
 #include "ofMain.h"
 #include "wheel.h"
 #include "imagedrawer.h"
-#include "shed.h"
+#include "grayshed.h"
 #include "zone.h"
 #include "scriptutility.h"
 #include "colorshed.h"
+#include "genericshed.h"
 
 
 #include "ofxGui.h"
@@ -42,7 +43,7 @@ public:
     ofParameter<bool> saveOption;
     string imageFn;
     ofImage pic;
-    colorShed * workshop;
+    genericShed * workshop;
     int numberOfCall;
 
     ofxPanel guiAlgo;

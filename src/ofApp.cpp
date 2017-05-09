@@ -19,7 +19,7 @@ void ofApp::setup(){
     pinPositionsSaverFn = outputFolder + "pinPositions.dat";
     pinPositionsInputFn = outputFolder + "inputPinPositions.dat";
 
-    workshop = new substractiveColorShed(pic);
+    workshop = new grayShed(pic, imageFn);
 
     numberOfCall = 0;
     computeGridNeeded = true;
@@ -27,6 +27,7 @@ void ofApp::setup(){
     allParameters.setName("Parameters"); 
 
     allParameters.add(workshop->globalP);
+    allParameters.add(workshop->inFlyP);
     allParameters.add(workshop->infoP);
 
 
@@ -113,7 +114,7 @@ void ofApp::draw(){
     }
     else if (! stopAlgo)
     {
-        workshop->computeNextStepAndDrawThreeStrings();
+        workshop->computeAndDrawOneStep();
     }
 
     zoneB.drawImageInZone(workshop->result);
@@ -159,7 +160,7 @@ void ofApp::draw(){
         workshop->computeLightnessAbsoluteError();
     }
 
-    if (((workshop->numberStringP % 1000 ) == 1) and saveOption ){
+    if (((workshop->stepsNumberP % 1000 ) == 1) and saveOption ){
 
         this->onSaveImagesPressed();
 
@@ -264,7 +265,7 @@ void ofApp::onSaveImagesPressed()
     strftime(buff, 30, "d:%Y%m%d-h:%H%M%S", localtime(&now));
 
     string para =   "-n:" + imageFn
-                    + "-s:"+ std::to_string(workshop->numberStringP)
+                    + "-s:"+ std::to_string(workshop->stepsNumberP)
                     + "-p:"+ std::to_string(workshop->numberPinsP)
                     + "-ao:" + std::to_string(workshop->algoOpacityP)
                     + "-do:" + std::to_string(workshop->drawOpacityP)

@@ -3,57 +3,20 @@
 
 #include "ofMain.h"
 #include "wheel.h"
-#include "imagedrawer.h"
+#include "genericshed.h"
 
-class colorShed
+class colorShed :public genericShed
 {
 public:
-    colorShed(ofImage inputImg);
+    colorShed(ofImage inputImg, string imageNameInput);
 
-
-    int w ; // width of the image we use
-    int h ; // height of the image we use
-
-    ofImage originalImg;
-    ofImage originalImgCrop;
-    ofImage result;
-
-
-    ofParameterGroup infoP;
-    ofParameter<int> numberStringP; // number of string currentlly in use
-    ofParameter<int> LightnessAbsoluteError;
-
-    ofParameterGroup globalP;
-    ofParameter<int> numberPinsP;
-    ofParameter<int> maxNumberStringP; // set -1 for infinity
-
-
-    abstractWheel wel;
-    imageDrawer drawer;
-
-
-    list<int*> * ** lines;
-    list<int> stringPath;
-
-    int currentPinIdxRed; // used in computeNextPinAndDrawOneString()
-    int currentPinIdxGreen; // used in computeNextPinAndDrawOneString()
-    int currentPinIdxBlue; // used in computeNextPinAndDrawOneString()
-
-
-
-    void setWandH();
-    void setupOfParameter();
-    void setOriginalImgCrop();
-    virtual void setEmptyResult();
-    void setupWheel(abstractWheel wel);
-
-
-    int computeLightnessAbsoluteError();
+    int currentPinIdxRed;
+    int currentPinIdxGreen;
+    int currentPinIdxBlue;
 
 
     int findNextBestPin(int pinIdx, float (colorShed::*pScoreFunction)(list<int * > ));
-
-    virtual void computeNextStepAndDrawThreeStrings();
+    void computeAndDrawOneStep();
 
     float greenLineScoreSignedDifferenceBetweenOriginalAndResult(list<int *> l);
     float redLineScoreSignedDifferenceBetweenOriginalAndResult(list<int *> l);
@@ -66,17 +29,20 @@ public:
 };
 
 
-class substractiveColorShed: public colorShed {
+class substractiveColorShed: public genericShed {
 
 public:
 
-    substractiveColorShed(ofImage inputImg);
+    substractiveColorShed(ofImage inputImg, string imageName);
 
-    void setEmptyResult();
+
+    int currentPinIdxCyan;
+    int currentPinIdxMagenta;
+    int currentPinIdxYellow;
 
 
     int findNextBestPin(int pinIdx, float (substractiveColorShed::*pScoreFunction)(list<int * > ));
-    void computeNextStepAndDrawThreeStrings();
+    void computeAndDrawOneStep();
 
     float cyanLineScoreSignedDifferenceBetweenOriginalAndResult(list<int *> l);
     float magentaLineScoreSignedDifferenceBetweenOriginalAndResult(list<int *> l);
@@ -87,8 +53,6 @@ public:
     void computeNextYellowPinAndDrawOneString();
 
 };
-
-
 
 
 

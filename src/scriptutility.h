@@ -2,7 +2,7 @@
 #define SCRIPTUTILITY_H
 
 #include "ofMain.h"
-#include "shed.h"
+#include "grayshed.h"
 #include "wheel.h"
 
 
@@ -12,7 +12,7 @@ public:
 
     scriptUtility();
     void run();
-    string getSavingName(shed workshop, string imageFn);
+    string getSavingName(genericShed *workshop, string imageFn);
 };
 
 #endif // SCRIPTUTILITY_H
