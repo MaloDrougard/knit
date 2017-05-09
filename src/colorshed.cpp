@@ -208,93 +208,6 @@ float colorShed::blueLineScoreSignedDifferenceBetweenOriginalAndResult( list<int
 
 
 
-int colorShed::findNextBestRedPin(int pinIdx){
-// go through all the pins and determine the next best one
-// the Score function only need to be positive monotone
-
-
-    float bestScore = INT_MIN;
-    float tempScore = 0;
-
-    int bestNextIdx = 0;
-    int tempIdx = 0;
-
-
-    for( int i = 0; i < wel.pinsNumber; i++){
-        tempIdx = ( i + pinIdx) % wel.pinsNumber;
-        tempScore = redLineScoreSignedDifferenceBetweenOriginalAndResult(*(lines[pinIdx][tempIdx]));
-
-
-        if (tempScore > bestScore){
-            bestScore = tempScore;
-            bestNextIdx = tempIdx;
-        }
-    }
-
-    return bestNextIdx;
-
-}
-
-
-int colorShed::findNextBestGreenPin(int pinIdx){
-// go through all the pins and determine the next best one
-// the Score function only need to be positive monotone
-
-
-    float bestScore = INT_MIN;
-    float tempScore = 0;
-
-    int bestNextIdx = 0;
-    int tempIdx = 0;
-
-
-    for( int i = 0; i < wel.pinsNumber; i++){
-        tempIdx = ( i + pinIdx) % wel.pinsNumber;
-        tempScore = greenLineScoreSignedDifferenceBetweenOriginalAndResult(*(lines[pinIdx][tempIdx]));
-
-
-        if (tempScore > bestScore){
-            bestScore = tempScore;
-            bestNextIdx = tempIdx;
-        }
-    }
-
-    return bestNextIdx;
-
-}
-
-
-
-
-int colorShed::findNextBestBluePin(int pinIdx){
-// go through all the pins and determine the next best one
-// the Score function only need to be positive monotone
-
-
-    float bestScore = INT_MIN;
-    float tempScore = 0;
-
-    int bestNextIdx = 0;
-    int tempIdx = 0;
-
-
-    for( int i = 0; i < wel.pinsNumber; i++){
-        tempIdx = ( i + pinIdx) % wel.pinsNumber;
-        tempScore = blueLineScoreSignedDifferenceBetweenOriginalAndResult(*(lines[pinIdx][tempIdx]));
-
-
-        if (tempScore > bestScore){
-            bestScore = tempScore;
-            bestNextIdx = tempIdx;
-        }
-    }
-
-    return bestNextIdx;
-
-}
-
-
-
 void colorShed::computeNextRedPinAndDrawOneString(){
 
     if ((maxNumberStringP == -1 ) or (numberStringP < maxNumberStringP )) {
@@ -406,14 +319,264 @@ int colorShed::findNextBestPin(int pinIdx, float (colorShed::*pScoreFunction)(li
 
 }
 
+void colorShed::computeNextStepAndDrawThreeStrings()
+{
+    this->computeNextRedPinAndDrawOneString();
+    this->computeNextGreenPinAndDrawOneString();
+    this->computeNextBluePinAndDrawOneString();
+
+}
+
+
 
 substractiveColorShed::substractiveColorShed(ofImage inputImg): colorShed(inputImg)
 {
+    setEmptyResult();
 
 }
 
-int substractiveColorShed::findNextBestPin(int pinIdx)
+void substractiveColorShed::setEmptyResult()
 {
-    std::cout << "overwrite " << std::endl;
-    return 2;
+
+    result.allocate(w, h , OF_IMAGE_COLOR);
+    result.setColor(ofColor::white);
+    result.update();
+
 }
+
+int substractiveColorShed::findNextBestPin(int pinIdx, float (substractiveColorShed::*pScoreFunction)(list<int *>))
+{
+    float bestScore = INT_MIN;
+    float tempScore = 0;
+
+    int bestNextIdx = 0;
+    int tempIdx = 0;
+
+
+    for( int i = 0; i < wel.pinsNumber; i++){
+        tempIdx = ( i + pinIdx) % wel.pinsNumber;
+        tempScore = (this->*pScoreFunction)(*(lines[pinIdx][tempIdx]));
+
+
+        if (tempScore > bestScore){
+            bestScore = tempScore;
+            bestNextIdx = tempIdx;
+        }
+    }
+
+    return bestNextIdx;
+}
+
+void substractiveColorShed::computeNextStepAndDrawThreeStrings()
+{
+    this->computeNextCyanPinAndDrawOneString();
+    this->computeNextMagentaPinAndDrawOneString();
+    this->computeNextYellowPinAndDrawOneString();
+}
+
+
+
+float substractiveColorShed::cyanLineScoreSignedDifferenceBetweenOriginalAndResult(list<int *> l)
+{
+
+    ofColor colorOri;
+    ofColor colorRes;
+
+    float redOri;
+    float redRes;
+
+    float cOri;
+    float cRes;
+
+    int numberOfPixel = 0;
+    float tempScore = 0;
+    float score = 0;
+
+    for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++)
+    {
+        colorOri = originalImgCrop.getColor( (*it)[0], (*it)[1] );
+        colorRes = result.getColor((*it)[0], (*it)[1] );
+
+        redOri = colorOri.r;
+        redRes = colorRes.r;
+
+        cOri = 1 - (redOri / colorOri.limit() );
+        cRes = 1 - (redRes / colorOri.limit() );
+
+        tempScore = cOri - cRes;
+        score += tempScore;
+        numberOfPixel = numberOfPixel + 1;
+    }
+
+    score = score / (float) numberOfPixel; // to not advantage long line
+
+    return score;
+
+}
+
+
+
+float substractiveColorShed::magentaLineScoreSignedDifferenceBetweenOriginalAndResult(list<int *> l)
+{
+
+    ofColor colorOri;
+    ofColor colorRes;
+
+    float greenOri;
+    float greenRes;
+
+    float cOri;
+    float cRes;
+
+    int numberOfPixel = 0;
+    float tempScore = 0;
+    float score = 0;
+
+    for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++)
+    {
+        colorOri = originalImgCrop.getColor( (*it)[0], (*it)[1] );
+        colorRes = result.getColor((*it)[0], (*it)[1] );
+
+        greenOri = colorOri.g;
+        greenRes = colorRes.g;
+
+        cOri = 1 - (greenOri / colorOri.limit() );
+        cRes = 1 - (greenRes / colorOri.limit() );
+
+        tempScore = cOri - cRes;
+        score += tempScore;
+        numberOfPixel = numberOfPixel + 1;
+    }
+
+    score = score / (float) numberOfPixel; // to not advantage long line
+
+    return score;
+
+}
+
+float substractiveColorShed::yellowLineScoreSignedDifferenceBetweenOriginalAndResult(list<int *> l)
+{
+
+    ofColor colorOri;
+    ofColor colorRes;
+
+    float blueOri;
+    float blueRes;
+
+    float yOri;
+    float yRes;
+
+    int numberOfPixel = 0;
+    float tempScore = 0;
+    float score = 0;
+
+    for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++)
+    {
+        colorOri = originalImgCrop.getColor( (*it)[0], (*it)[1] );
+        colorRes = result.getColor((*it)[0], (*it)[1] );
+
+        blueOri = colorOri.b;
+        blueRes = colorRes.b;
+
+        yOri = 1 - (blueOri / colorOri.limit() );
+        yRes = 1 - (blueRes / colorOri.limit() );
+
+        tempScore = yOri - yRes;
+        score += tempScore;
+        numberOfPixel = numberOfPixel + 1;
+    }
+
+    score = score / (float) numberOfPixel; // to not advantage long line
+
+    return score;
+
+
+}
+
+
+
+
+
+
+void substractiveColorShed::computeNextYellowPinAndDrawOneString()
+{
+    if ((maxNumberStringP == -1 ) or (numberStringP < maxNumberStringP )) {
+
+        int nextPinIdx1 = -1;
+
+        float decreaseV = 9;
+        int opacity = 9;
+
+        nextPinIdx1 = findNextBestPin(currentPinIdxBlue, &substractiveColorShed::yellowLineScoreSignedDifferenceBetweenOriginalAndResult );
+
+        // draw the line
+        drawer.decreasePixels(result, *(lines[currentPinIdxBlue][nextPinIdx1]), ofColor(0, 0, opacity)); // decrease red parameter give cyan color to apears
+        std::cout << "yellow step: " << currentPinIdxBlue << ":" << nextPinIdx1 << std::endl;
+        numberStringP++;
+
+
+        // save path
+        stringPath.push_back(currentPinIdxBlue);
+
+        // update the pin
+        currentPinIdxBlue = nextPinIdx1;
+    }
+}
+
+
+
+
+void substractiveColorShed::computeNextCyanPinAndDrawOneString()
+{
+    if ((maxNumberStringP == -1 ) or (numberStringP < maxNumberStringP )) {
+
+        int nextPinIdx1 = -1;
+
+        float decreaseV = 9;
+        int opacity = 9;
+
+        nextPinIdx1 = findNextBestPin(currentPinIdxRed, &substractiveColorShed::cyanLineScoreSignedDifferenceBetweenOriginalAndResult );
+
+        // draw the line
+        drawer.decreasePixels(result, *(lines[currentPinIdxRed][nextPinIdx1]), ofColor(opacity, 0, 0)); // decrease red parameter give cyan color to apears
+        std::cout << "cyan step: " << currentPinIdxRed << ":" << nextPinIdx1 << std::endl;
+
+        numberStringP++;
+
+
+        // save path
+        stringPath.push_back(currentPinIdxRed);
+
+        // update the pin
+        currentPinIdxRed = nextPinIdx1;
+    }
+}
+
+
+
+void substractiveColorShed::computeNextMagentaPinAndDrawOneString()
+{
+    if ((maxNumberStringP == -1 ) or (numberStringP < maxNumberStringP )) {
+
+        int nextPinIdx1 = -1;
+
+        float decreaseV = 9;
+        int opacity = 9;
+
+        nextPinIdx1 = findNextBestPin(currentPinIdxGreen, &substractiveColorShed::magentaLineScoreSignedDifferenceBetweenOriginalAndResult );
+
+        // draw the line
+        drawer.decreasePixels(result, *(lines[currentPinIdxGreen][nextPinIdx1]), ofColor(0, opacity, 0));
+        std::cout << "magenta step: " << currentPinIdxGreen << ":" << nextPinIdx1 << std::endl;
+
+        numberStringP++;
+
+
+        // save path
+        stringPath.push_back(currentPinIdxGreen);
+
+        // update the pin
+        currentPinIdxGreen = nextPinIdx1;
+    }
+}
+

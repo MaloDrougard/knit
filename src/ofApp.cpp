@@ -19,7 +19,7 @@ void ofApp::setup(){
     pinPositionsSaverFn = outputFolder + "pinPositions.dat";
     pinPositionsInputFn = outputFolder + "inputPinPositions.dat";
 
-    workshop = new colorShed(pic);
+    workshop = new substractiveColorShed(pic);
 
     numberOfCall = 0;
     computeGridNeeded = true;
@@ -113,9 +113,7 @@ void ofApp::draw(){
     }
     else if (! stopAlgo)
     {
-        workshop->computeNextRedPinAndDrawOneString();
-        workshop->computeNextGreenPinAndDrawOneString();
-        workshop->computeNextBluePinAndDrawOneString();
+        workshop->computeNextStepAndDrawThreeStrings();
     }
 
     zoneB.drawImageInZone(workshop->result);

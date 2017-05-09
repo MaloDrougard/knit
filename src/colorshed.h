@@ -44,29 +44,20 @@ public:
     void setWandH();
     void setupOfParameter();
     void setOriginalImgCrop();
-    void setEmptyResult();
+    virtual void setEmptyResult();
     void setupWheel(abstractWheel wel);
 
 
     int computeLightnessAbsoluteError();
 
 
-    float lineScoreSignedDifferenceBetweenOriginalAndResult(list<int *> l);
+    int findNextBestPin(int pinIdx, float (colorShed::*pScoreFunction)(list<int * > ));
+
+    virtual void computeNextStepAndDrawThreeStrings();
 
     float greenLineScoreSignedDifferenceBetweenOriginalAndResult(list<int *> l);
     float redLineScoreSignedDifferenceBetweenOriginalAndResult(list<int *> l);
     float blueLineScoreSignedDifferenceBetweenOriginalAndResult(list<int *> l);
-
-
-
-
-    virtual int findNextBestPin(int pinIdx, float (colorShed::*pScoreFunction)(list<int * > ));
-
-    int findNextBestRedPin(int pinIdx);
-    int findNextBestGreenPin(int pinIdx);
-    int findNextBestBluePin(int pinIdx);
-
-    void computeNextPinAndUpdateResult();
 
     void computeNextRedPinAndDrawOneString();
     void computeNextGreenPinAndDrawOneString();
@@ -81,10 +72,19 @@ public:
 
     substractiveColorShed(ofImage inputImg);
 
-    int findNextBestPin(int pinIdx);
+    void setEmptyResult();
 
 
+    int findNextBestPin(int pinIdx, float (substractiveColorShed::*pScoreFunction)(list<int * > ));
+    void computeNextStepAndDrawThreeStrings();
 
+    float cyanLineScoreSignedDifferenceBetweenOriginalAndResult(list<int *> l);
+    float magentaLineScoreSignedDifferenceBetweenOriginalAndResult(list<int *> l);
+    float yellowLineScoreSignedDifferenceBetweenOriginalAndResult(list<int *> l);
+
+    void computeNextCyanPinAndDrawOneString();
+    void computeNextMagentaPinAndDrawOneString();
+    void computeNextYellowPinAndDrawOneString();
 
 };
 
