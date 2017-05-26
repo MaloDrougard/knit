@@ -127,7 +127,7 @@ void colorShed::computeNextRedPinAndDrawOneString(){
         nextPinIdxRed = findNextBestPin(currentPinIdxRed, &colorShed::redLineScoreSignedDifferenceBetweenOriginalAndResult );
 
         // draw the line
-        drawer.increasePixels(result, *(wel.lines[currentPinIdxRed][nextPinIdxRed]), ofColor(drawOpacityP ,0,0));
+        drawer.increasePixels(result, *(wel.thickLines[currentPinIdxRed][nextPinIdxRed]), ofColor(drawOpacityP ,0,0));
 
         std::cout << "red step: " << currentPinIdxRed << ":" << nextPinIdxRed << std::endl;
 
@@ -146,7 +146,7 @@ void colorShed::computeNextGreenPinAndDrawOneString(){
         nextPinIdx1 = findNextBestPin(currentPinIdxGreen, &colorShed::greenLineScoreSignedDifferenceBetweenOriginalAndResult );
 
         // draw the line
-        drawer.increasePixels(result, *(wel.lines[currentPinIdxGreen][nextPinIdx1]), ofColor(0,drawOpacityP,0));
+        drawer.increasePixels(result, *(wel.thickLines[currentPinIdxGreen][nextPinIdx1]), ofColor(0,drawOpacityP,0));
 
         std::cout << "green step: " << currentPinIdxGreen << ":" << nextPinIdx1 << std::endl;
 
@@ -166,7 +166,7 @@ void colorShed::computeNextBluePinAndDrawOneString(){
         nextPinIdx1 = findNextBestPin(currentPinIdxBlue, &colorShed::blueLineScoreSignedDifferenceBetweenOriginalAndResult );
 
         // draw the line
-        drawer.increasePixels(result, *(wel.lines[currentPinIdxBlue][nextPinIdx1]), ofColor(0,0,drawOpacityP));
+        drawer.increasePixels(result, *(wel.thickLines[currentPinIdxBlue][nextPinIdx1]), ofColor(0,0,drawOpacityP));
 
         std::cout << "blue step: " << currentPinIdxBlue << ":" << nextPinIdx1 << std::endl;
 
@@ -189,7 +189,7 @@ int colorShed::findNextBestPin(int pinIdx, float (colorShed::*pScoreFunction)(li
 
     for( int i = 0; i < wel.pinsNumber; i++){
         tempIdx = ( i + pinIdx) % wel.pinsNumber;
-        tempScore = (this->*pScoreFunction)(*(wel.lines[pinIdx][tempIdx]));
+        tempScore = (this->*pScoreFunction)(*(wel.thickLines[pinIdx][tempIdx]));
 
 
         if (tempScore > bestScore){
@@ -238,7 +238,7 @@ int substractiveColorShed::findNextBestPin(int pinIdx, float (substractiveColorS
 
     for( int i = 0; i < wel.pinsNumber; i++){
         tempIdx = ( i + pinIdx) % wel.pinsNumber;
-        tempScore = (this->*pScoreFunction)(*(wel.lines[pinIdx][tempIdx]));
+        tempScore = (this->*pScoreFunction)(*(wel.thickLines[pinIdx][tempIdx]));
 
 
         if (tempScore > bestScore){
@@ -388,7 +388,7 @@ void substractiveColorShed::computeNextCyanPinAndDrawOneString()
         nextPinIdx1 = findNextBestPin(currentPinIdxCyan, &substractiveColorShed::cyanLineScoreSignedDifferenceBetweenOriginalAndResult );
 
         // draw the line //  decrease red value -> enforce cyan value
-        drawer.decreasePixels(result, *(wel.lines[currentPinIdxCyan][nextPinIdx1]), ofColor(drawOpacityP, 0, 0)); // decrease red parameter give cyan color to apears
+        drawer.decreasePixels(result, *(wel.thickLines[currentPinIdxCyan][nextPinIdx1]), ofColor(drawOpacityP, 0, 0)); // decrease red parameter give cyan color to apears
         std::cout << "cyan step: " << currentPinIdxCyan << ":" << nextPinIdx1 << std::endl;
 
         // update the pin
@@ -406,7 +406,7 @@ void substractiveColorShed::computeNextMagentaPinAndDrawOneString()
         nextPinIdx1 = findNextBestPin(currentPinIdxMagenta, &substractiveColorShed::magentaLineScoreSignedDifferenceBetweenOriginalAndResult );
 
         // draw the line
-        drawer.decreasePixels(result, *(wel.lines[currentPinIdxMagenta][nextPinIdx1]), ofColor(0, drawOpacityP, 0));
+        drawer.decreasePixels(result, *(wel.thickLines[currentPinIdxMagenta][nextPinIdx1]), ofColor(0, drawOpacityP, 0));
         std::cout << "magenta step: " << currentPinIdxMagenta << ":" << nextPinIdx1 << std::endl;
 
         // update the pin
@@ -424,7 +424,7 @@ void substractiveColorShed::computeNextYellowPinAndDrawOneString()
         nextPinIdx1 = findNextBestPin(currentPinIdxYellow, &substractiveColorShed::yellowLineScoreSignedDifferenceBetweenOriginalAndResult );
 
         // draw the line  //
-        drawer.decreasePixels(result, *(wel.lines[currentPinIdxYellow][nextPinIdx1]), ofColor(0, 0, drawOpacityP));
+        drawer.decreasePixels(result, *(wel.thickLines[currentPinIdxYellow][nextPinIdx1]), ofColor(0, 0, drawOpacityP));
         std::cout << "yellow step: " << currentPinIdxYellow << ":" << nextPinIdx1 << std::endl;
 
         // update the pin

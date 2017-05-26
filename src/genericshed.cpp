@@ -31,7 +31,7 @@ void genericShed::setupOfParameter()
 {
 
     globalP.setName("Global Algorithm Parameters");
-    globalP.add(maxStepsNumberP.set("max #steps", 100003, -1, 40000) );
+    globalP.add(maxStepsNumberP.set("max #steps", 40003, -1, 50000) );
     inFlyP.setName("In Fly Parameters");
     inFlyP.add(drawOpacityP.set("Draw Opacity", 9, 0, 255));
     infoP.setName("Process infos");

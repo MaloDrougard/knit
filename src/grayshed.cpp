@@ -401,7 +401,7 @@ int grayShed::findNextBestPin(int pinIdx){
 
     for( int i = 0; i < wel.pinsNumber; i++){
         tempIdx = ( i + pinIdx) % wel.pinsNumber;
-        tempScore = (this->*pScoreFunctionInUse)(*(wel.lines[pinIdx][tempIdx]));
+        tempScore = (this->*pScoreFunctionInUse)(*(wel.thickLines[pinIdx][tempIdx]));
 
 
         if (tempScore > bestScore){
@@ -455,10 +455,10 @@ void grayShed::computeAndDrawOneStep()
         nextPinIdx1 = findNextBestPin(currentPinIdx1);
 
         // increase the value of the pixel that are under the line in sketch image (in case we use this lineScore function)
-        drawer.increasePixels(sketchImg, *(wel.lines[currentPinIdx1][nextPinIdx1]), ofColor(algoOpacityP, algoOpacityP, algoOpacityP));
+        drawer.increasePixels(sketchImg, *(wel.thickLines[currentPinIdx1][nextPinIdx1]), ofColor(algoOpacityP, algoOpacityP, algoOpacityP));
 
         // draw the line on result
-        drawer.decreasePixels(result, *(wel.lines[currentPinIdx1][nextPinIdx1]), ofColor(drawOpacityP,drawOpacityP,drawOpacityP));
+        drawer.decreasePixels(result, *(wel.thickLines[currentPinIdx1][nextPinIdx1]), ofColor(drawOpacityP,drawOpacityP,drawOpacityP));
 
         std::cout << "step: " << currentPinIdx1 << ":" << nextPinIdx1 << std::endl;
 

@@ -19,6 +19,7 @@ public:
 
     ofVec2f* pins; // array name are pointers
     list<int*> * ** lines; // all lines between all pins
+    list<int*> * ** thickLines; // lines with tickness
     ofImage pinsRepresentation;
     ofImage gridRepresentation;
 
@@ -29,6 +30,7 @@ public:
     void drawGridRepresentation();
     void randomifyslightlyPosition(); // try to avoid morrié effect
     void initializeLines();
+    void intializeThickLines();
     void destroyLines();
 
     void setup();
@@ -42,8 +44,7 @@ public:
 
     virtual  string getInfos(); // return a string that contains basic infos of the forme "
 
-
-
+    void drawThickGridRepresentation();
 };
 
 

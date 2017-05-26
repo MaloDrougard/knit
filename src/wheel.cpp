@@ -82,13 +82,48 @@ void abstractWheel::initializeLines(){
             lines[i][j] = tempL;
 
             if ( i != j){
+
                 drawer.getPixelIdxOfALineDDAAlgo(tempL, pins[i], pins[j]);
+
             }
 
         }
 
     }
 }
+
+void abstractWheel::intializeThickLines()
+{
+
+    list<int*> * tempL;
+
+    // initializing thickLines
+    thickLines = new list<int*> * * [pinsNumber];
+
+    for (int i = 0; i < pinsNumber; i++) {
+        thickLines[i] = new list<int*> * [pinsNumber];
+    }
+
+    for(int i = 0; i < pinsNumber; i ++ ){
+        for(int j = 0; j < pinsNumber; j++){
+
+            tempL = new list<int*>;
+            thickLines[i][j] = tempL;
+
+            if ( i != j){
+
+                drawer.setPixelIdxAndIntensityOfAThickLine(tempL, pins[i], pins[j], 2);
+
+            }
+
+        }
+
+    }
+}
+
+
+
+
 
 
 void abstractWheel::destroyLines(){
@@ -211,6 +246,28 @@ void abstractWheel::drawGridRepresentation()
     gridRepresentation.update();
 
 }
+
+
+
+void abstractWheel::drawThickGridRepresentation()
+{
+
+    list<int *> l;
+
+    gridRepresentation.allocate(this->w, this->h, OF_IMAGE_COLOR);
+    gridRepresentation.setColor(ofColor::white);
+
+    for(int i = 0; i < pinsNumber; i ++ ){
+        for(int j = 0; j < pinsNumber; j++){
+
+            l = *(thickLines[i][j]);
+            drawer.increasePixelsWithIntensity(gridRepresentation, l);
+        }
+    }
+    gridRepresentation.update();
+
+}
+
 
 
 wheelCircle::wheelCircle( int pinsNumber, int w, int h)

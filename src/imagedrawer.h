@@ -18,9 +18,16 @@ public:
 
     void printListIdx(list<int *> l);
 
-    void drawPixels(ofImage &img, list<int *>, ofColor color = ofColor(23,56,77));
+    void drawPixels(ofImage &img, list<int *> l, ofColor color = ofColor(23,56,77));
 
     void getPixelIdxOfALineDDAAlgo(list<int*> * l, ofVec2f l1, ofVec2f l2);
+
+
+    void setPixelIdxAndIntensityOfAThickLine(list<int *> *l, ofVec2f l1, ofVec2f l2, float width);
+
+
+    float percentageOfPixelAboveLine(float localStartY, float deltaV) ;
+    void percentTester();
 
     void incrementPixels(ofImage &img, list<int *> l, ofColor color);
 
@@ -28,6 +35,13 @@ public:
     void increasePixels(ofImage &img, list<int *> l, ofColor color);
 
     void freeListOf2Int(list<int *> * l);
+
+
+
+
+    void drawPixelsWithIntensity(ofImage &img, list<int *> l);
+
+    void increasePixelsWithIntensity(ofImage &img, list<int *> l);
 
 };
 

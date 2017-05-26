@@ -11,7 +11,7 @@ void ofApp::setup(){
 
 
     outputFolder = "/home/makem/Cours/knitProject/outputPics/";
-    imageFn = "abstract2";
+    imageFn = "white820x820";
     pic.load("/home/makem/Cours/knitProject/inputPics/" + imageFn + ".jpg");
     pic.setImageType(OF_IMAGE_COLOR);
 
@@ -19,7 +19,7 @@ void ofApp::setup(){
     pinPositionsSaverFn = outputFolder + "pinPositions.dat";
     pinPositionsInputFn = outputFolder + "inputPinPositions.dat";
 
-    workshop = new substractiveColorShed(pic, imageFn);
+    workshop = new grayShed(pic, imageFn);
 
     numberOfCall = 0;
     computeGridNeeded = true;
@@ -85,6 +85,10 @@ void ofApp::setup(){
     oneRandom = false;
     stopAlgo = true;
 
+
+
+
+    workshop->drawer.percentTester();
 }
 
 
@@ -136,7 +140,7 @@ void ofApp::draw(){
 
 
        if (computeGridNeeded){
-           wel->drawGridRepresentation();
+           wel->drawThickGridRepresentation();
            computeGridNeeded = false;
         }
 
@@ -262,10 +266,11 @@ void ofApp::onSaveImagesPressed()
 
 
     if (computeGridNeeded){
-        // wel->drawGridRepresentation();
-        // computeGridNeeded = false;
+         wel->drawThickGridRepresentation();
+         computeGridNeeded = false;
      }
 
+    wel->gridRepresentation.save(outputFolder + "grid.jpg" );
     workshop->saveResultImage(outputFolder);
 
 
@@ -325,6 +330,12 @@ void ofApp::gridValidation()
 
         this->workshop->setupWheel(*wel);
         this->wel->writePinPositionsToFile(pinPositionsSaverFn);
+
+
+        this->wel->intializeThickLines();
+        computeGridNeeded = True;
+
+      ;
 
 
 
