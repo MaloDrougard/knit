@@ -26,7 +26,7 @@ public:
     void setPixelIdxAndIntensityOfAThickLine(list<int *> *l, ofVec2f l1, ofVec2f l2, float width);
 
 
-    float percentageOfPixelAboveLine(float localStartY, float deltaV) ;
+    float percentageOfPixeBelowLine(float localStartY, float deltaV) ;
     void percentTester();
 
     void incrementPixels(ofImage &img, list<int *> l, ofColor color);

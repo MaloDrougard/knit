@@ -185,7 +185,7 @@ void imageDrawer::setPixelIdxAndIntensityOfAThickLine(list<int*> * l, ofVec2f l1
 
 // calculate the percentage of the pixel above the line
 
-float imageDrawer::percentageOfPixelAboveLine(float localStartY, float deltaV )
+float imageDrawer::percentageOfPixeBelowLine(float localStartY, float deltaV )
 {
 
 
@@ -197,32 +197,66 @@ float imageDrawer::percentageOfPixelAboveLine(float localStartY, float deltaV )
     float  pixelWidth = 1.0;
 
 
-    float factor = deltaV ;
+    float factor = abs(deltaV) ;
     float percent = -1;
 
-    if (localStartY < 0 ){
-        std::cerr << "localStartY in percent should be greater than zero, We base the coordinate system on bottom left cornet" << std::endl;
-        throw -3;
+
+    float localEndY = localStartY + deltaV;
+
+    if (factor > 1) {
+        std::cerr << "lines with gradient higher than 45 degree should be turn" << std::cerr;
+        throw -5;
     }
 
 
-    if ( (localStartY + deltaV) < 0  ) // case where the line cross the bottom boundary
-    {
-        percent = abs(((localStartY / factor) * localStartY) ) / 2    ;
+    // case where the line cross the left boundary first
+    if (localStartY >= 0 && localStartY <= 1) {
+
+        if ( localEndY < 0  ) // then cross the bottom boundary
+        {
+            percent = abs(((localStartY / factor) * localStartY) ) / 2    ;
+        }
+        else if ( localEndY > 1 ) // then cross the top boundary
+        {
+            float inverseY = 1 - localStartY ;
+            percent =  1  - ( (( inverseY / factor) * inverseY ) / 2  ) ;
+
+        }
+        else if ( (localEndY >= 0) &&  (localEndY) <= 1 ) // then cross the opposite boundary
+        {
+            percent = localStartY * 1 + ( deltaV / 2) ;
+        }
+        else {
+            std::cerr << "This path must never happend -> look for the bug" << std::endl;
+            throw -7;
+        }
     }
-    else if ( (localStartY + deltaV) > 1 ) // case where the line cross the top boundary
+    // case where the line is completely above the pixel
+    else if ( localStartY > 1 && localEndY >= 1)
     {
-        float inverseY = 1 - localStartY ;
-        percent =  1  - ( (( inverseY / factor) * inverseY ) / 2  ) ;
+        percent = 1;
+    }
+    else if (localStartY > 1 && localEndY < 1 && localEndY > 0  )
+    {
+            percent = 1 - ( ((localEndY / factor) * localEndY ) / 2 ) ;
 
     }
-    else if ( (localStartY + deltaV) <= 1 ) // case where the line cross the top opposite boundary
+    else if (localStartY < 0 && localEndY <= 0)
     {
-        percent = localStartY * 1 + ( deltaV / 2) ;
+        percent = 0;
     }
+    else if ( localStartY < 0 && localEndY > 0 && localEndY < 1 )
+    {
+        percent = (( localEndY/factor ) * localEndY ) / 2;
+    }
+
     else {
+        std::cerr << "This path must never happend -> look for the bug" << std::endl;
         throw -7;
+
     }
+
+
 
    return percent;
 
@@ -236,7 +270,7 @@ void imageDrawer::percentTester(){
     float actualY = 0.3; // y position from bottomLeft corner
     float value = -1;  // recived value
 
-    if ( this->percentageOfPixelAboveLine(actualY, deltaV ) > 0.089 && this->percentageOfPixelAboveLine(actualY, deltaV ) < 0.091 ) {
+    if ( this->percentageOfPixeBelowLine(actualY, deltaV ) > 0.089 && this->percentageOfPixeBelowLine(actualY, deltaV ) < 0.091 ) {
         std::cout << "dev-test percent, bottom boundary: succes" << std::endl;
     } else {
          std::cout << "dev-test percent, bottom boundary: fail" << std::endl;
@@ -245,7 +279,7 @@ void imageDrawer::percentTester(){
     deltaV = 0.2;
     actualY = 0.9;
 
-    if ( this->percentageOfPixelAboveLine(actualY, deltaV) > 0.974 && this->percentageOfPixelAboveLine(actualY, deltaV ) < 0.976 ) {
+    if ( this->percentageOfPixeBelowLine(actualY, deltaV) > 0.974 && this->percentageOfPixeBelowLine(actualY, deltaV ) < 0.976 ) {
         std::cout << "dev-test percent, top boundary: succes" << std::endl;
     } else {
          std::cout << "dev-test percent, top boundary: fail" << std::endl;
@@ -255,7 +289,7 @@ void imageDrawer::percentTester(){
     deltaV = -0.3;
     actualY = 0.8;
 
-    value = this->percentageOfPixelAboveLine(actualY, deltaV );
+    value = this->percentageOfPixeBelowLine(actualY, deltaV );
     if ( value > 0.64 && value  < 0.66 ) {
         std::cout << "dev-test percent, oposite boundary: succes" << std::endl;
     } else {
@@ -265,7 +299,7 @@ void imageDrawer::percentTester(){
     deltaV = 0.0;
     actualY = 0.0;
 
-    value = this->percentageOfPixelAboveLine(actualY, deltaV );
+    value = this->percentageOfPixeBelowLine(actualY, deltaV );
     if ( value == 0 ) {
         std::cout << "dev-test percent, extrem value 0: succes" << std::endl;
     } else {
@@ -275,12 +309,116 @@ void imageDrawer::percentTester(){
     deltaV = 1;
     actualY = 1;
 
-    value = this->percentageOfPixelAboveLine(actualY, deltaV );
+    value = this->percentageOfPixeBelowLine(actualY, deltaV );
     if ( value == 1 ) {
-        std::cout << "dev-test percent, extrem value 1: succes" << std::endl;
+        std::cout << "dev-test percent, extrem value only top left: succes" << std::endl;
     } else {
-         std::cout << "dev-test percent, extrem value 1: fail" << std::endl;
+         std::cout << "dev-test percent, extrem value only top left: fail" << std::endl;
     }
+
+
+    deltaV = 0;
+    actualY = 1;
+
+    value = this->percentageOfPixeBelowLine(actualY, deltaV );
+    if ( value == 1 ) {
+        std::cout << "dev-test percent, extrem value top boundary: succes" << std::endl;
+    } else {
+         std::cout << "dev-test percent, extrem value top boundary: fail" << std::endl;
+    }
+
+    deltaV = -0.4;
+    actualY = 0;
+
+    value = this->percentageOfPixeBelowLine(actualY, deltaV );
+    if ( value == 0 ) {
+        std::cout << "dev-test percent, extrem value bottom right boundary: succes" << std::endl;
+    } else {
+         std::cout << "dev-test percent, extrem value  bottom right: fail" << std::endl;
+    }
+
+
+    deltaV = 1;
+    actualY = 0;
+
+    value = this->percentageOfPixeBelowLine(actualY, deltaV );
+    if ( value < 0.51 && value > 0.49 ) {
+        std::cout << "dev-test percent, diagonal: succes" << std::endl;
+    } else {
+         std::cout << "dev-test percent, diagonal: fail" << std::endl;
+    }
+
+
+
+    deltaV = 0.7;
+    actualY = 1.2;
+
+    value = this->percentageOfPixeBelowLine(actualY, deltaV );
+    if ( value == 1) {
+        std::cout << "dev-test percent, line completely above the pixel: succes" << std::endl;
+    } else {
+         std::cout << "dev-test percent,  line completely above the pixel: fail" << std::endl;
+    }
+
+
+
+    deltaV = -0.7;
+    actualY = -999;
+
+    value = this->percentageOfPixeBelowLine(actualY, deltaV );
+    if ( value == 0) {
+        std::cout << "dev-test percent, line completely bellow the pixel: succes" << std::endl;
+    } else {
+         std::cout << "dev-test percent,  line completely bellow the pixel: fail" << std::endl;
+    }
+
+
+    deltaV = 1;
+    actualY = -999;
+
+    value = this->percentageOfPixeBelowLine(actualY, deltaV );
+    if ( value == 0) {
+        std::cout << "dev-test percent, line completely bellow the pixel 2: succes" << std::endl;
+    } else {
+         std::cout << "dev-test percent,  line completely bellow the pixel 2: fail" << std::endl;
+    }
+
+
+    deltaV = 0.8;
+    actualY = -0.3;
+
+    value = this->percentageOfPixeBelowLine(actualY, deltaV );
+    if ( value < 0.16 && value > 0.15) {
+        std::cout << "dev-test percent, line start below then cross pixel: succes" << std::endl;
+    } else {
+         std::cout << "dev-test percent,  line start below then cross pixel: fail" << std::endl;
+    }
+
+
+
+
+    deltaV = -0.8;
+    actualY = 1.3;
+
+    value = this->percentageOfPixeBelowLine(actualY, deltaV );
+    if ( value < 0.844 && value > 0.843) {
+        std::cout << "dev-test percent, line start above then cross pixel: succes" << std::endl;
+    } else {
+         std::cout << "dev-test percent,  line start above then cross pixel: fail" << std::endl;
+    }
+
+
+
+    deltaV = 3;
+    actualY = -1;
+
+    // crash test
+    // value = this->percentageOfPixeBelowLine(actualY, deltaV );
+
+
+
+
+
 
 
 
