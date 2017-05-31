@@ -87,8 +87,9 @@ void ofApp::setup(){
 
 
 
-
     workshop->drawer.percentTester();
+
+    workshop->drawer.TestSetPixelIdxAndIntensityBasedOnPercentageOfAThickLine();
 }
 
 

@@ -16,7 +16,9 @@ public:
 
     void drawPins(ofImage &img, ofVec2f* pins, int pinsNumber);
 
-    void printListIdx(list<int *> l);
+    void printListIdx(list<int *> l);    
+    void printListIdxAndIntensity(list<int *> l);
+
 
     void drawPixels(ofImage &img, list<int *> l, ofColor color = ofColor(23,56,77));
 
@@ -27,6 +29,22 @@ public:
 
 
     float percentageOfPixeBelowLine(float localStartY, float deltaV) ;
+    float percentageOfPixeAboveLine(float localStartY, float deltaV) ;
+
+    void setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(list<int *> *l, ofVec2f l1, ofVec2f l2, float width);
+
+
+    void setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranA(list<int *> *l,int maxIntensity, int x0, int y0, int x1, int y1);
+
+    void setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranB(list<int *> *l,int maxIntensity, int x0, int y0, int x1, int y1);
+
+
+
+
+
+    void TestSetPixelIdxAndIntensityBasedOnPercentageOfAThickLine();
+
+
     void percentTester();
 
     void incrementPixels(ofImage &img, list<int *> l, ofColor color);

@@ -211,8 +211,8 @@ void abstractWheel::drawPins()
 
     for (int i = 0; i < pinsNumber; i++ )
     {
-        x = static_cast<int>((pins[i]).x);
-        y = static_cast<int>((pins[i]).y);
+        x = floor((pins[i]).x);  // imagine you have a origin at the top right with y in direction of the bottom -> then you transform the position into the index where the position stand in
+        y = floor((pins[i]).y);
 
 
         if(x < 0 or y < 0 or x >= this->w or y >= this->h ){

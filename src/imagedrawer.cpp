@@ -238,7 +238,7 @@ float imageDrawer::percentageOfPixeBelowLine(float localStartY, float deltaV )
     }
     else if (localStartY > 1 && localEndY < 1 && localEndY > 0  )
     {
-            percent = 1 - ( ((localEndY / factor) * localEndY ) / 2 ) ;
+            percent = 1 - ( ( ( (1-localEndY) / factor) * (1- localEndY) ) / 2 ) ;
 
     }
     else if (localStartY < 0 && localEndY <= 0)
@@ -262,6 +262,558 @@ float imageDrawer::percentageOfPixeBelowLine(float localStartY, float deltaV )
 
 
 }
+
+float imageDrawer::percentageOfPixeAboveLine(float localStartY, float deltaV)
+{
+    return (1 - percentageOfPixeBelowLine(localStartY, deltaV) );
+}
+
+void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(list<int *> *l, ofVec2f l1, ofVec2f l2, float width)
+{
+
+    int maxIntensity = 255;
+    // assume x0 to the left
+    // assume x1 - x0 > 0
+
+    int x0 = floor(l1.x);
+    int y0 = floor(l1.y);
+    int x1 = floor(l2.x);
+    int y1 = floor(l2.y);
+
+
+
+    int xPixelIndex = x0;
+    int yPixelIndex = y0;
+
+
+
+    float deltaV =  (y1 - y0) / (x1 - x0);
+    float spaceBetweenTheBordersOfTheLineOnTheYAxis = sqrt(1 + pow(deltaV, 2)); // assuming width of 1
+
+
+    // we always start at the center of pixel indexes
+    float localYTopBorder = 0.5 * (-deltaV) + 0.5 + spaceBetweenTheBordersOfTheLineOnTheYAxis/2 ; // we are actually at pixel (x0, y0)
+    float localYBottomBorder = localYTopBorder - spaceBetweenTheBordersOfTheLineOnTheYAxis;
+
+
+
+    float realYatX = y0 + localYTopBorder;  // the real Y mean the value of the top border of the line at the value of the xPixelIndex (not the center but the left side)
+
+
+    if (deltaV <= 0 )
+    {
+
+        float percent = -1;
+        float percent1 = -1;
+        float percent2 = -1;
+
+        int zeroPercentCounter = 0;
+        int* xyi;
+
+        while  (xPixelIndex <= x1) {
+
+            // initialize the loop
+            yPixelIndex = floor(realYatX);
+            localYTopBorder = realYatX - yPixelIndex;
+            localYBottomBorder = localYTopBorder - spaceBetweenTheBordersOfTheLineOnTheYAxis;
+
+            zeroPercentCounter = 0; // because a zerro percent can happend at the begin if the the border is on the grid
+
+
+            // do until line is no more on the pixel at index xPixelIndex, yPixelIndex
+            do {
+
+                percent1 = percentageOfPixeBelowLine( localYTopBorder, deltaV);
+                percent2 = percentageOfPixeAboveLine( localYBottomBorder, deltaV);
+                percent = 1 - (1 -percent1) - (1- percent2);
+
+                if (percent != 0 ){
+
+                    xyi = new int[3];
+                    xyi[0] = xPixelIndex;
+                    xyi[1] = yPixelIndex;
+                    xyi[2] = floor(percent * maxIntensity);
+
+                    l->push_back(xyi);
+
+
+                } else {
+                    zeroPercentCounter++;
+                }
+
+                localYTopBorder = localYTopBorder + 1; // we slide from one pixel
+                localYBottomBorder = localYBottomBorder + 1;
+
+                --yPixelIndex;
+
+            } while ( percent != 0 || zeroPercentCounter < 2 );
+
+            // go on step to the right
+            xPixelIndex = xPixelIndex + 1;
+            realYatX = realYatX + deltaV;
+
+        }
+
+
+
+   }
+
+    else if (deltaV > 0 )
+    {
+
+        float percent = -1;
+        float percent1 = -1;
+        float percent2 = -1;
+
+        int zeroPercentCounter = 0;
+        int* xyi;
+
+        while  (xPixelIndex <= x1) {
+
+            // initialize the loop
+            yPixelIndex = floor(realYatX - spaceBetweenTheBordersOfTheLineOnTheYAxis); // this time we start at the lowest point
+            localYTopBorder = realYatX - yPixelIndex;
+            localYBottomBorder = localYTopBorder - spaceBetweenTheBordersOfTheLineOnTheYAxis;
+
+            zeroPercentCounter = 0; // because a zerro percent can happend at the begin if the the border is on the grid
+
+
+            // do until line is no more on the pixel at index xPixelIndex, yPixelIndex
+            do {
+
+                percent1 = percentageOfPixeBelowLine( localYTopBorder, deltaV);
+                percent2 = percentageOfPixeAboveLine( localYBottomBorder, deltaV);
+                percent = 1 - (1 -percent1) - (1- percent2);
+
+                if (percent != 0 ){
+
+                    xyi = new int[3];
+                    xyi[0] = xPixelIndex;
+                    xyi[1] = yPixelIndex;
+                    xyi[2] = floor(percent * maxIntensity);
+
+                    l->push_back(xyi);
+
+
+                } else {
+                    zeroPercentCounter++;
+                }
+
+                localYTopBorder = localYTopBorder - 1; // we slide from one pixel
+                localYBottomBorder = localYBottomBorder - 1;
+
+                yPixelIndex++;
+
+            } while ( percent != 0 || zeroPercentCounter < 2 );
+
+            // go on step to the right
+            xPixelIndex = xPixelIndex + 1;
+            realYatX = realYatX + deltaV;
+
+        }
+
+
+    }
+
+
+}
+
+void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranA(list<int *> *l, int maxIntensity,  int x0, int y0, int x1, int y1)
+{
+
+
+    int switchTemp;
+
+    // make shure  the x0 is at the left
+    if ( x1 <= x0){
+        switchTemp = x0;
+        x0 = x1;
+        x1 = switchTemp;
+        switchTemp = y0;
+        y0 = y1;
+        y1 = switchTemp;
+
+    }
+
+
+    int xPixelIndex = x0;
+    int yPixelIndex = y0;
+
+
+
+    float deltaV =  (y1 - y0) / (x1 - x0);
+    float spaceBetweenTheBordersOfTheLineOnTheYAxis = sqrt(1 + pow(deltaV, 2)); // assuming width of 1
+
+
+    if ( x0 >= x1 || deltaV > 1 ){
+        std::cerr << "should not be in cadran A" << std::endl;
+    }
+
+
+
+    // we always start at the center of pixel indexes
+    float localYTopBorder = 0.5 * (-deltaV) + 0.5 + spaceBetweenTheBordersOfTheLineOnTheYAxis/2 ; // we are actually at pixel (x0, y0)
+    float localYBottomBorder = localYTopBorder - spaceBetweenTheBordersOfTheLineOnTheYAxis;
+
+
+
+    float realYatX = y0 + localYTopBorder;  // the real Y mean the value of the top border of the line at the value of the xPixelIndex (not the center but the left side)
+
+
+    if (deltaV <= 0 )
+    {
+
+        float percent = -1;
+        float percent1 = -1;
+        float percent2 = -1;
+
+        int zeroPercentCounter = 0;
+        int* xyi;
+
+        while  (xPixelIndex <= x1) {
+
+            // initialize the loop
+            yPixelIndex = floor(realYatX);
+            localYTopBorder = realYatX - yPixelIndex;
+            localYBottomBorder = localYTopBorder - spaceBetweenTheBordersOfTheLineOnTheYAxis;
+
+            zeroPercentCounter = 0; // because a zerro percent can happend at the begin if the the border is on the grid
+
+
+            // do until line is no more on the pixel at index xPixelIndex, yPixelIndex
+            do {
+
+                percent1 = percentageOfPixeBelowLine( localYTopBorder, deltaV);
+                percent2 = percentageOfPixeAboveLine( localYBottomBorder, deltaV);
+                percent = 1 - (1 -percent1) - (1- percent2);
+
+                if (percent != 0 ){
+
+                    xyi = new int[3];
+                    xyi[0] = xPixelIndex;
+                    xyi[1] = yPixelIndex;
+                    xyi[2] = floor(percent * maxIntensity);
+
+                    l->push_back(xyi);
+
+
+                } else {
+                    zeroPercentCounter++;
+                }
+
+                localYTopBorder = localYTopBorder + 1; // we slide from one pixel
+                localYBottomBorder = localYBottomBorder + 1;
+
+                --yPixelIndex;
+
+            } while ( percent != 0 || zeroPercentCounter < 2 );
+
+            // go on step to the right
+            xPixelIndex = xPixelIndex + 1;
+            realYatX = realYatX + deltaV;
+
+        }
+
+
+
+   }
+
+    else if (deltaV > 0 )
+    {
+
+        float percent = -1;
+        float percent1 = -1;
+        float percent2 = -1;
+
+        int zeroPercentCounter = 0;
+        int* xyi;
+
+        while  (xPixelIndex <= x1) {
+
+            // initialize the loop
+            yPixelIndex = floor(realYatX - spaceBetweenTheBordersOfTheLineOnTheYAxis); // this time we start at the lowest point
+            localYTopBorder = realYatX - yPixelIndex;
+            localYBottomBorder = localYTopBorder - spaceBetweenTheBordersOfTheLineOnTheYAxis;
+
+            zeroPercentCounter = 0; // because a zerro percent can happend at the begin if the the border is on the grid
+
+
+            // do until line is no more on the pixel at index xPixelIndex, yPixelIndex
+            do {
+
+                percent1 = percentageOfPixeBelowLine( localYTopBorder, deltaV);
+                percent2 = percentageOfPixeAboveLine( localYBottomBorder, deltaV);
+                percent = 1 - (1 -percent1) - (1- percent2);
+
+                if (percent != 0 ){
+
+                    xyi = new int[3];
+                    xyi[0] = xPixelIndex;
+                    xyi[1] = yPixelIndex;
+                    xyi[2] = floor(percent * maxIntensity);
+
+                    l->push_back(xyi);
+
+
+                } else {
+                    zeroPercentCounter++;
+                }
+
+                localYTopBorder = localYTopBorder - 1; // we slide from one pixel
+                localYBottomBorder = localYBottomBorder - 1;
+
+                yPixelIndex++;
+
+            } while ( percent != 0 || zeroPercentCounter < 2 );
+
+            // go on step to the right
+            xPixelIndex = xPixelIndex + 1;
+            realYatX = realYatX + deltaV;
+
+        }
+
+
+    }
+
+
+
+}
+
+void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranB(list<int *> *l, int maxIntensity, int x0, int y0, int x1, int y1)
+{
+
+
+    // switch of the coordinate
+    int switchTemp = x0;
+    x0 = y0;
+    y0 = switchTemp;
+    switchTemp = x1;
+    x1 = y1;
+    y1 =switchTemp;
+
+    // make shure  the x0 is at the left
+    if ( x1 <= x0){
+        switchTemp = x0;
+        x0 = x1;
+        x1 = switchTemp;
+        switchTemp = y0;
+        y0 = y1;
+        y1 = switchTemp;
+
+    }
+
+
+
+    int xPixelIndex = x0;
+    int yPixelIndex = y0;
+
+
+
+    float deltaV =  (float)(y1 - y0) / (float)(x1 - x0);
+    float spaceBetweenTheBordersOfTheLineOnTheYAxis = sqrt(1 + pow(deltaV, 2)); // assuming width of 1
+
+
+    if ( x0 >= x1 || deltaV > 1 ){
+        std::cerr << "should not be in cadran A" << std::endl;
+    }
+
+
+
+    // we always start at the center of pixel indexes
+    float localYTopBorder = 0.5 * (-deltaV) + 0.5 + spaceBetweenTheBordersOfTheLineOnTheYAxis/2 ; // we are actually at pixel (x0, y0)
+    float localYBottomBorder = localYTopBorder - spaceBetweenTheBordersOfTheLineOnTheYAxis;
+
+
+
+    float realYatX = y0 + localYTopBorder;  // the real Y mean the value of the top border of the line at the value of the xPixelIndex (not the center but the left side)
+
+
+    if (deltaV <= 0 )
+    {
+
+        float percent = -1;
+        float percent1 = -1;
+        float percent2 = -1;
+
+        int zeroPercentCounter = 0;
+        int* xyi;
+
+        while  (xPixelIndex <= x1) {
+
+            // initialize the loop
+            yPixelIndex = floor(realYatX);
+            localYTopBorder = realYatX - yPixelIndex;
+            localYBottomBorder = localYTopBorder - spaceBetweenTheBordersOfTheLineOnTheYAxis;
+
+            zeroPercentCounter = 0; // because a zerro percent can happend at the begin if the the border is on the grid
+
+
+            // do until line is no more on the pixel at index xPixelIndex, yPixelIndex
+            do {
+
+                percent1 = percentageOfPixeBelowLine( localYTopBorder, deltaV);
+                percent2 = percentageOfPixeAboveLine( localYBottomBorder, deltaV);
+                percent = 1 - (1 -percent1) - (1- percent2);
+
+                if (percent != 0 ){
+
+                    xyi = new int[3];
+                    xyi[1] = xPixelIndex;
+                    xyi[0] = yPixelIndex;
+                    xyi[2] = floor(percent * maxIntensity);
+
+                    l->push_back(xyi);
+
+
+                } else {
+                    zeroPercentCounter++;
+                }
+
+                localYTopBorder = localYTopBorder + 1; // we slide from one pixel
+                localYBottomBorder = localYBottomBorder + 1;
+
+                --yPixelIndex;
+
+            } while ( percent != 0 || zeroPercentCounter < 2 );
+
+            // go on step to the right
+            xPixelIndex = xPixelIndex + 1;
+            realYatX = realYatX + deltaV;
+
+        }
+
+
+
+   }
+
+    else if (deltaV > 0 )
+    {
+
+        float percent = -1;
+        float percent1 = -1;
+        float percent2 = -1;
+
+        int zeroPercentCounter = 0;
+        int* xyi;
+
+        while  (xPixelIndex <= x1) {
+
+            // initialize the loop
+            yPixelIndex = floor(realYatX - spaceBetweenTheBordersOfTheLineOnTheYAxis); // this time we start at the lowest point
+            localYTopBorder = realYatX - yPixelIndex;
+            localYBottomBorder = localYTopBorder - spaceBetweenTheBordersOfTheLineOnTheYAxis;
+
+            zeroPercentCounter = 0; // because a zerro percent can happend at the begin if the the border is on the grid
+
+
+            // do until line is no more on the pixel at index xPixelIndex, yPixelIndex
+            do {
+
+                percent1 = percentageOfPixeBelowLine( localYTopBorder, deltaV);
+                percent2 = percentageOfPixeAboveLine( localYBottomBorder, deltaV);
+                percent = 1 - (1 -percent1) - (1- percent2);
+
+                if (percent != 0 ){
+
+                    xyi = new int[3];
+                    xyi[1] = xPixelIndex;
+                    xyi[0] = yPixelIndex;
+                    xyi[2] = floor(percent * maxIntensity);
+
+                    l->push_back(xyi);
+
+
+                } else {
+                    zeroPercentCounter++;
+                }
+
+                localYTopBorder = localYTopBorder - 1; // we slide from one pixel
+                localYBottomBorder = localYBottomBorder - 1;
+
+                yPixelIndex++;
+
+            } while ( percent != 0 || zeroPercentCounter < 2 );
+
+            // go on step to the right
+            xPixelIndex = xPixelIndex + 1;
+            realYatX = realYatX + deltaV;
+
+        }
+
+
+    }
+
+
+}
+
+
+
+void imageDrawer::TestSetPixelIdxAndIntensityBasedOnPercentageOfAThickLine()
+{
+
+
+    list<int*>  l ;
+
+    this->setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(&l, ofVec2f(1.5,3.5), ofVec2f(3.5,1.5), 1);
+
+    this->printListIdxAndIntensity(l);
+
+
+    l.clear();
+
+    this->setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranA(&l, 255, 1, 3 ,3, 1);
+
+    this->printListIdxAndIntensity(l);
+
+
+
+    l.clear();
+
+    this->setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranB(&l, 100, 0, 4 ,1, 0);
+
+    this->printListIdxAndIntensity(l);
+
+
+
+    l.clear();
+
+    this->setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranB(&l, 100, 0, 0 ,2 ,3);
+
+    this->printListIdxAndIntensity(l);
+
+
+
+
+    l.clear();
+
+    this->setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(&l, ofVec2f(1,1), ofVec2f(3,1), 1);
+
+    this->printListIdxAndIntensity(l);
+
+
+
+    l.clear();
+
+    this->setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(&l, ofVec2f(0.2,1.3), ofVec2f(9.09,1), 1);
+
+    this->printListIdxAndIntensity(l);
+
+
+    l.clear();
+
+    this->setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(&l, ofVec2f(1.5,1.5), ofVec2f(3.5,3.5), 1);
+
+    this->printListIdxAndIntensity(l);
+
+
+
+
+
+
+
+}
+
+
 
 
 void imageDrawer::percentTester(){
@@ -504,10 +1056,22 @@ void imageDrawer::printListIdx(list<int * > l ){
     std::cout << "print list:\n";
 
     for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++)
-        std::cout << (*it)[0] << ',' << (*it)[1] << '-';
+        std::cout << '(' << (*it)[0] << ',' << (*it)[1] << ") , " ;
 
-    std::cout << '\n';
+    std::cout << std::endl;
 
+
+}
+
+void imageDrawer::printListIdxAndIntensity(list<int *> l)
+{
+
+    std::cout << "print list:\n";
+
+    for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++)
+        std::cout << '(' << (*it)[0] << ',' << (*it)[1] << ',' << (*it)[2] << ") , " ;
+
+    std::cout << std::endl;
 }
 
 void imageDrawer::drawPins(ofImage &img, ofVec2f* pins, int pinsNumber){
