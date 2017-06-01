@@ -98,89 +98,6 @@ void imageDrawer::getPixelIdxOfALineDDAAlgo(list<int*> * l, ofVec2f l1, ofVec2f 
 
 
 
-// During this process the list l is fill with index of pixel contains in the line and is intensity
-// the forme is: xyi[0] = x position of the pixel, xyi[1] = y position of the pixel, xyi[3] = intensity
-void imageDrawer::setPixelIdxAndIntensityOfAThickLine(list<int*> * l, ofVec2f l1, ofVec2f l2 , float width)
-{
-
-   int x0 = l1.x;
-   int y0 = l1.y;
-   int x1 = l2.x;
-   int y1 = l2.y;
-
-   int dx = abs(x1-x0);
-   int sx = x0 < x1 ? 1 : -1; // step directio
-   int dy = abs(y1-y0);
-   int sy = y0 < y1 ? 1 : -1;
-
-   int err = dx-dy;  // difference
-   int e2, x2, y2;
-   int intensity;
-
-   int * xyi; // store xy position and intensity
-
-   float ed = dx+dy == 0 ? 1 : sqrt((float)dx*dx+(float)dy*dy);
-
-   for (width = (width+1)/2; ; )
-   {                                   /* pixel loop */
-
-       intensity =  0 > 255 * ( abs(err-dx+dy)/ed - width + 1) ? 0 : 255*(abs(e2)/ed-width+1) ;
-       xyi = new int[3];
-       xyi[0] = x0;
-       xyi[1] = y0;
-       xyi[2] =  intensity;
-
-       l->push_back(xyi);
-
-       e2 = err; //dx-dy
-       x2 = x0;
-
-      if (2*e2 >= -dx) {                              // test end //             /* x step */
-
-          for (e2 += dy, y2 = y0 ; e2 < ed*width && (y1 != y2 || dx > dy); e2 += dx){
-
-              //setPixelColor(x0, y2 += sy, max(0,255*(abs(e2)/ed-width+1)));
-
-              intensity = 0 > 255*(abs(e2)/ed-width+1) ? 0 : 255*(abs(e2)/ed-width+1) ;
-              y2 = y2 + sy;
-              xyi = new int[3];
-              xyi[0] = x0;
-              xyi[1] = y2;
-              xyi[2] = static_cast<int>( intensity );
-
-              l->push_back(xyi);
-
-          }
-
-          if (x0 == x1) break;
-
-          e2 = err;
-          err -= dy;
-          x0 += sx;
-      }
-      if (2*e2 <= dy) {                                            /* y step */
-
-          for (e2 = dx-e2; e2 < ed*width && (x1 != x2 || dx < dy); e2 += dy){
-            //setPixelColor(x2 += sx, y0, max(0,255*(abs(e2)/ed-width+1)));
-
-              intensity = 0 > 255*(abs(e2)/ed-width+1) ? 0 : 255*(abs(e2)/ed-width+1) ;
-              x2 = x2 + sx;
-              xyi = new int[3];
-              xyi[0] = x2;
-              xyi[1] = y0;
-              xyi[2] = static_cast<int>( intensity);
-
-              l->push_back(xyi);
-
-          }
-          if (y0 == y1) break;
-
-          err += dx;
-          y0 += sy;
-      }
-   }
-}
-
 
 
 // calculate the percentage of the pixel above the line
@@ -268,10 +185,9 @@ float imageDrawer::percentageOfPixeAboveLine(float localStartY, float deltaV)
     return (1 - percentageOfPixeBelowLine(localStartY, deltaV) );
 }
 
-void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(list<int *> *l, ofVec2f l1, ofVec2f l2, float width)
+void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(list<int *> *l, int maxIntensity, float width, ofVec2f l1, ofVec2f l2 )
 {
 
-    int maxIntensity = 255;
     // assume x0 to the left
     // assume x1 - x0 > 0
 
@@ -282,138 +198,23 @@ void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(list<int 
 
 
 
-    int xPixelIndex = x0;
-    int yPixelIndex = y0;
 
-
-
-    float deltaV =  (y1 - y0) / (x1 - x0);
-    float spaceBetweenTheBordersOfTheLineOnTheYAxis = sqrt(1 + pow(deltaV, 2)); // assuming width of 1
-
-
-    // we always start at the center of pixel indexes
-    float localYTopBorder = 0.5 * (-deltaV) + 0.5 + spaceBetweenTheBordersOfTheLineOnTheYAxis/2 ; // we are actually at pixel (x0, y0)
-    float localYBottomBorder = localYTopBorder - spaceBetweenTheBordersOfTheLineOnTheYAxis;
-
-
-
-    float realYatX = y0 + localYTopBorder;  // the real Y mean the value of the top border of the line at the value of the xPixelIndex (not the center but the left side)
-
-
-    if (deltaV <= 0 )
+    if ( x0 == x1 && y0 == y1)
     {
-
-        float percent = -1;
-        float percent1 = -1;
-        float percent2 = -1;
-
-        int zeroPercentCounter = 0;
-        int* xyi;
-
-        while  (xPixelIndex <= x1) {
-
-            // initialize the loop
-            yPixelIndex = floor(realYatX);
-            localYTopBorder = realYatX - yPixelIndex;
-            localYBottomBorder = localYTopBorder - spaceBetweenTheBordersOfTheLineOnTheYAxis;
-
-            zeroPercentCounter = 0; // because a zerro percent can happend at the begin if the the border is on the grid
-
-
-            // do until line is no more on the pixel at index xPixelIndex, yPixelIndex
-            do {
-
-                percent1 = percentageOfPixeBelowLine( localYTopBorder, deltaV);
-                percent2 = percentageOfPixeAboveLine( localYBottomBorder, deltaV);
-                percent = 1 - (1 -percent1) - (1- percent2);
-
-                if (percent != 0 ){
-
-                    xyi = new int[3];
-                    xyi[0] = xPixelIndex;
-                    xyi[1] = yPixelIndex;
-                    xyi[2] = floor(percent * maxIntensity);
-
-                    l->push_back(xyi);
-
-
-                } else {
-                    zeroPercentCounter++;
-                }
-
-                localYTopBorder = localYTopBorder + 1; // we slide from one pixel
-                localYBottomBorder = localYBottomBorder + 1;
-
-                --yPixelIndex;
-
-            } while ( percent != 0 || zeroPercentCounter < 2 );
-
-            // go on step to the right
-            xPixelIndex = xPixelIndex + 1;
-            realYatX = realYatX + deltaV;
-
-        }
-
-
-
-   }
-
-    else if (deltaV > 0 )
-    {
-
-        float percent = -1;
-        float percent1 = -1;
-        float percent2 = -1;
-
-        int zeroPercentCounter = 0;
-        int* xyi;
-
-        while  (xPixelIndex <= x1) {
-
-            // initialize the loop
-            yPixelIndex = floor(realYatX - spaceBetweenTheBordersOfTheLineOnTheYAxis); // this time we start at the lowest point
-            localYTopBorder = realYatX - yPixelIndex;
-            localYBottomBorder = localYTopBorder - spaceBetweenTheBordersOfTheLineOnTheYAxis;
-
-            zeroPercentCounter = 0; // because a zerro percent can happend at the begin if the the border is on the grid
-
-
-            // do until line is no more on the pixel at index xPixelIndex, yPixelIndex
-            do {
-
-                percent1 = percentageOfPixeBelowLine( localYTopBorder, deltaV);
-                percent2 = percentageOfPixeAboveLine( localYBottomBorder, deltaV);
-                percent = 1 - (1 -percent1) - (1- percent2);
-
-                if (percent != 0 ){
-
-                    xyi = new int[3];
-                    xyi[0] = xPixelIndex;
-                    xyi[1] = yPixelIndex;
-                    xyi[2] = floor(percent * maxIntensity);
-
-                    l->push_back(xyi);
-
-
-                } else {
-                    zeroPercentCounter++;
-                }
-
-                localYTopBorder = localYTopBorder - 1; // we slide from one pixel
-                localYBottomBorder = localYBottomBorder - 1;
-
-                yPixelIndex++;
-
-            } while ( percent != 0 || zeroPercentCounter < 2 );
-
-            // go on step to the right
-            xPixelIndex = xPixelIndex + 1;
-            realYatX = realYatX + deltaV;
-
-        }
-
-
+        std::cerr << "Warning in imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLine: The line passed as argument is on one pixel" << std::endl;
     }
+    else if ( abs(x1 - x0) >= abs(y1 -y0))
+    {
+        this->setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranA(l, maxIntensity, x0, y0, x1, y1);
+    }
+    else if ( abs(x1 - x0) < abs(y1 -y0) )
+    {
+        this->setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranB(l, maxIntensity, x0, y0, x1, y1);
+    }
+    else {
+        std::cerr << "Error in imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLine: unexpected branche" << std::endl;
+    }
+
 
 
 }
@@ -441,7 +242,7 @@ void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranA(li
 
 
 
-    float deltaV =  (y1 - y0) / (x1 - x0);
+    float deltaV =  (float)(y1 - y0) / (float)(x1 - x0);
     float spaceBetweenTheBordersOfTheLineOnTheYAxis = sqrt(1 + pow(deltaV, 2)); // assuming width of 1
 
 
@@ -747,235 +548,6 @@ void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranB(li
 }
 
 
-
-void imageDrawer::TestSetPixelIdxAndIntensityBasedOnPercentageOfAThickLine()
-{
-
-
-    list<int*>  l ;
-
-    this->setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(&l, ofVec2f(1.5,3.5), ofVec2f(3.5,1.5), 1);
-
-    this->printListIdxAndIntensity(l);
-
-
-    l.clear();
-
-    this->setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranA(&l, 255, 1, 3 ,3, 1);
-
-    this->printListIdxAndIntensity(l);
-
-
-
-    l.clear();
-
-    this->setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranB(&l, 100, 0, 4 ,1, 0);
-
-    this->printListIdxAndIntensity(l);
-
-
-
-    l.clear();
-
-    this->setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranB(&l, 100, 0, 0 ,2 ,3);
-
-    this->printListIdxAndIntensity(l);
-
-
-
-
-    l.clear();
-
-    this->setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(&l, ofVec2f(1,1), ofVec2f(3,1), 1);
-
-    this->printListIdxAndIntensity(l);
-
-
-
-    l.clear();
-
-    this->setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(&l, ofVec2f(0.2,1.3), ofVec2f(9.09,1), 1);
-
-    this->printListIdxAndIntensity(l);
-
-
-    l.clear();
-
-    this->setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(&l, ofVec2f(1.5,1.5), ofVec2f(3.5,3.5), 1);
-
-    this->printListIdxAndIntensity(l);
-
-
-
-
-
-
-
-}
-
-
-
-
-void imageDrawer::percentTester(){
-
-    float deltaV = -0.5;
-    float actualY = 0.3; // y position from bottomLeft corner
-    float value = -1;  // recived value
-
-    if ( this->percentageOfPixeBelowLine(actualY, deltaV ) > 0.089 && this->percentageOfPixeBelowLine(actualY, deltaV ) < 0.091 ) {
-        std::cout << "dev-test percent, bottom boundary: succes" << std::endl;
-    } else {
-         std::cout << "dev-test percent, bottom boundary: fail" << std::endl;
-    }
-
-    deltaV = 0.2;
-    actualY = 0.9;
-
-    if ( this->percentageOfPixeBelowLine(actualY, deltaV) > 0.974 && this->percentageOfPixeBelowLine(actualY, deltaV ) < 0.976 ) {
-        std::cout << "dev-test percent, top boundary: succes" << std::endl;
-    } else {
-         std::cout << "dev-test percent, top boundary: fail" << std::endl;
-    }
-
-
-    deltaV = -0.3;
-    actualY = 0.8;
-
-    value = this->percentageOfPixeBelowLine(actualY, deltaV );
-    if ( value > 0.64 && value  < 0.66 ) {
-        std::cout << "dev-test percent, oposite boundary: succes" << std::endl;
-    } else {
-         std::cout << "dev-test percent, oposite boundary: fail" << std::endl;
-    }
-
-    deltaV = 0.0;
-    actualY = 0.0;
-
-    value = this->percentageOfPixeBelowLine(actualY, deltaV );
-    if ( value == 0 ) {
-        std::cout << "dev-test percent, extrem value 0: succes" << std::endl;
-    } else {
-         std::cout << "dev-test percent, extrem value 0: fail" << std::endl;
-    }
-
-    deltaV = 1;
-    actualY = 1;
-
-    value = this->percentageOfPixeBelowLine(actualY, deltaV );
-    if ( value == 1 ) {
-        std::cout << "dev-test percent, extrem value only top left: succes" << std::endl;
-    } else {
-         std::cout << "dev-test percent, extrem value only top left: fail" << std::endl;
-    }
-
-
-    deltaV = 0;
-    actualY = 1;
-
-    value = this->percentageOfPixeBelowLine(actualY, deltaV );
-    if ( value == 1 ) {
-        std::cout << "dev-test percent, extrem value top boundary: succes" << std::endl;
-    } else {
-         std::cout << "dev-test percent, extrem value top boundary: fail" << std::endl;
-    }
-
-    deltaV = -0.4;
-    actualY = 0;
-
-    value = this->percentageOfPixeBelowLine(actualY, deltaV );
-    if ( value == 0 ) {
-        std::cout << "dev-test percent, extrem value bottom right boundary: succes" << std::endl;
-    } else {
-         std::cout << "dev-test percent, extrem value  bottom right: fail" << std::endl;
-    }
-
-
-    deltaV = 1;
-    actualY = 0;
-
-    value = this->percentageOfPixeBelowLine(actualY, deltaV );
-    if ( value < 0.51 && value > 0.49 ) {
-        std::cout << "dev-test percent, diagonal: succes" << std::endl;
-    } else {
-         std::cout << "dev-test percent, diagonal: fail" << std::endl;
-    }
-
-
-
-    deltaV = 0.7;
-    actualY = 1.2;
-
-    value = this->percentageOfPixeBelowLine(actualY, deltaV );
-    if ( value == 1) {
-        std::cout << "dev-test percent, line completely above the pixel: succes" << std::endl;
-    } else {
-         std::cout << "dev-test percent,  line completely above the pixel: fail" << std::endl;
-    }
-
-
-
-    deltaV = -0.7;
-    actualY = -999;
-
-    value = this->percentageOfPixeBelowLine(actualY, deltaV );
-    if ( value == 0) {
-        std::cout << "dev-test percent, line completely bellow the pixel: succes" << std::endl;
-    } else {
-         std::cout << "dev-test percent,  line completely bellow the pixel: fail" << std::endl;
-    }
-
-
-    deltaV = 1;
-    actualY = -999;
-
-    value = this->percentageOfPixeBelowLine(actualY, deltaV );
-    if ( value == 0) {
-        std::cout << "dev-test percent, line completely bellow the pixel 2: succes" << std::endl;
-    } else {
-         std::cout << "dev-test percent,  line completely bellow the pixel 2: fail" << std::endl;
-    }
-
-
-    deltaV = 0.8;
-    actualY = -0.3;
-
-    value = this->percentageOfPixeBelowLine(actualY, deltaV );
-    if ( value < 0.16 && value > 0.15) {
-        std::cout << "dev-test percent, line start below then cross pixel: succes" << std::endl;
-    } else {
-         std::cout << "dev-test percent,  line start below then cross pixel: fail" << std::endl;
-    }
-
-
-
-
-    deltaV = -0.8;
-    actualY = 1.3;
-
-    value = this->percentageOfPixeBelowLine(actualY, deltaV );
-    if ( value < 0.844 && value > 0.843) {
-        std::cout << "dev-test percent, line start above then cross pixel: succes" << std::endl;
-    } else {
-         std::cout << "dev-test percent,  line start above then cross pixel: fail" << std::endl;
-    }
-
-
-
-    deltaV = 3;
-    actualY = -1;
-
-    // crash test
-    // value = this->percentageOfPixeBelowLine(actualY, deltaV );
-
-
-
-
-
-
-
-
-}
-
 void imageDrawer::drawPixelsWithIntensity(ofImage &img, list<int *> l)
 {
 
@@ -1038,7 +610,7 @@ void imageDrawer::increasePixelsWithIntensity(ofImage &img, list<int *> l)
 
 
 
-void imageDrawer::freeListOf2Int(list<int *> * l )
+void imageDrawer::freeListOfIntArray(list<int *> * l )
 {
     for(std::list<int *>::iterator it = l->begin(); it  != l->end(); it++){
         delete[] (*it);
@@ -1069,7 +641,7 @@ void imageDrawer::printListIdxAndIntensity(list<int *> l)
     std::cout << "print list:\n";
 
     for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++)
-        std::cout << '(' << (*it)[0] << ',' << (*it)[1] << ',' << (*it)[2] << ") , " ;
+        std::cout << '(' << (*it)[0] << ',' << (*it)[1] << ',' << (*it)[2] << ") " ;
 
     std::cout << std::endl;
 }

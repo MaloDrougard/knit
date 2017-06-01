@@ -31,6 +31,8 @@ Project{
             "src/wheel.h",
             "src/zone.cpp",
             "src/zone.h",
+            "test/test.cpp",
+            "test/test.h",
         ]
 
         of.addons: [

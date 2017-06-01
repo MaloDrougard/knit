@@ -86,10 +86,9 @@ void ofApp::setup(){
     stopAlgo = true;
 
 
-
-    workshop->drawer.percentTester();
-
-    workshop->drawer.TestSetPixelIdxAndIntensityBasedOnPercentageOfAThickLine();
+    test tester = test();
+    tester.imageDrawerPercent();
+    tester.setPixelIdxAndIntensityBasedOnPercentageOfAThickLine();
 }
 
 

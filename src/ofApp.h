@@ -13,6 +13,8 @@
 #include "colorshed.h"
 #include "genericshed.h"
 
+#include "../test/test.h"
+
 
 #include "ofxGui.h"
 

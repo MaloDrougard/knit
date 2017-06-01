@@ -112,7 +112,7 @@ void abstractWheel::intializeThickLines()
 
             if ( i != j){
 
-                drawer.setPixelIdxAndIntensityOfAThickLine(tempL, pins[i], pins[j], 2);
+                drawer.setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(tempL, 200, 1, pins[i], pins[j]);
 
             }
 
@@ -138,7 +138,7 @@ void abstractWheel::destroyLines(){
     {
         for( int y= 0; y < pinsNumber; y++){
             tempL = lines[x][y];
-            drawer.freeListOf2Int(tempL);
+            drawer.freeListOfIntArray(tempL);
             delete tempL;
         }
     }
