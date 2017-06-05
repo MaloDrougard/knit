@@ -28,9 +28,9 @@ public:
     float percentageOfPixeBelowLine(float localStartY, float deltaV) ;
     float percentageOfPixeAboveLine(float localStartY, float deltaV) ;
 
-    void setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(list<int *> *l, int maxIntensity, float width, ofVec2f l1, ofVec2f l2);
-    void setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranA(list<int *> *l,int maxIntensity, int x0, int y0, int x1, int y1);
-    void setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranB(list<int *> *l,int maxIntensity, int x0, int y0, int x1, int y1);
+    void setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(list<int *> *l, int maxIntensity, int maxXPixelIdx, int maxYPixelIdx, ofVec2f l1, ofVec2f l2);
+    void setPixelIdxAndIntensityBasedOnPercentageOf1PixelWidthLineCadranA(list<int *> *l, int maxIntensity, int maxXPixelIdx, int maxYPixelIdx, float x0, float y0, float x1, float y1);
+    void setPixelIdxAndIntensityBasedOnPercentageOf1PixelWidthLineCadranB(list<int *> *l, int maxIntensity,int maxXPixelIdx, int maxYPixelIdx, float x0, float y0, float x1, float y1);
 
 
     void incrementPixels(ofImage &img, list<int *> l, ofColor color);
@@ -41,6 +41,7 @@ public:
 
     void drawPixelsWithIntensity(ofImage &img, list<int *> l);
     void increasePixelsWithIntensity(ofImage &img, list<int *> l);
+    void decreasePixelsWithIntensity(ofImage  &img, list<int *> l);
 
 };
 

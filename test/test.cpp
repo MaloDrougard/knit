@@ -175,7 +175,7 @@ void test::imageDrawerPercent(){
 
 void test::setPixelIdxAndIntensityBasedOnPercentageOfAThickLine()
 {
-
+/*
     imageDrawer drawer = imageDrawer();
     list<int*>  l ;
 
@@ -219,18 +219,6 @@ void test::setPixelIdxAndIntensityBasedOnPercentageOfAThickLine()
     // this time we give the corner -> should be the same as before because we alwas take the center of the pixel as starting point
     std::cout << "***dev-test intensity line: 45 degree (bis) " << std::endl;
     drawer.setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(&l, 100, 1, ofVec2f(1,1), ofVec2f(3,3));
-    std::cout << "result: ";
-    drawer.printListIdxAndIntensity(l);
-    std::cout << "expected result:\n(1,0,23) (1,1,88) (1,2,23) (2,1,23) (2,2,88) (2,3,23) (3,2,23) (3,3,88) (3,4,23) " << std::endl;
-
-
-
-
-    drawer.freeListOfIntArray(&l);
-    l.clear();
-
-    std::cout << "***dev-test intensity line: 45 degree (invert) " << std::endl;
-    drawer.setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(&l, 100, 1, ofVec2f(3,3),  ofVec2f(1,1));
     std::cout << "result: ";
     drawer.printListIdxAndIntensity(l);
     std::cout << "expected result:\n(1,0,23) (1,1,88) (1,2,23) (2,1,23) (2,2,88) (2,3,23) (3,2,23) (3,3,88) (3,4,23) " << std::endl;
@@ -296,12 +284,11 @@ void test::setPixelIdxAndIntensityBasedOnPercentageOfAThickLine()
     drawer.freeListOfIntArray(&l);
     l.clear();
 
-    std::cout << "***dev-test intensity line: line form (0,0) to (0,3) " << std::endl;
-    drawer.setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(&l, 100, 1, ofVec2f(0,0),  ofVec2f(0,3));
+    std::cout << "***dev-test intensity line: line form (0.5,0.5) to (0.5,3.5) " << std::endl;
+    drawer.setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(&l, 100, 1, ofVec2f(0.5,0.5),  ofVec2f(0.5,3.5));
     std::cout << "result: ";
     drawer.printListIdxAndIntensity(l);
     std::cout << "expected result:\n(0,0,100) (0,1, 100) (0,2,100) (0,3,100) " << std::endl;
-
 
 
 
@@ -322,14 +309,14 @@ void test::setPixelIdxAndIntensityBasedOnPercentageOfAThickLine()
     drawer.freeListOfIntArray(&l);
     l.clear();
 
-    std::cout << "***dev-test intensity line: line form (0,0) to (,0) " << std::endl;
+    std::cout << "***dev-test intensity line: line form (0,0) to (0,0) " << std::endl;
     drawer.setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(&l, 100, 1, ofVec2f(0,0),  ofVec2f(0,0));
     std::cout << "result: ";
     drawer.printListIdxAndIntensity(l);
     std::cout << "expected result: warning"<< std::endl;
 
 
-
+*/
 
 
 

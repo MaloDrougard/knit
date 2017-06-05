@@ -69,7 +69,7 @@ void ofApp::setup(){
     guiGrid.setup();
     guiGrid.setSize(guiGridWidth, 100);
     guiGrid.setName("Grid parameters");
-    guiGrid.add(numberOfPins.set("#pins", 240, 4, 720));
+    guiGrid.add(numberOfPins.set("#pins", 64, 4, 720));
     guiGrid.add(typeWheelInfo.setup("", "1=circle,2=square,3=tribal,4=extra,5=file"));
     typeWheelInfo.setSize(guiGridWidth, typeWheelInfo.getHeight());
     guiGrid.add(typeOfWheel.set("type of grid",1,1,5));
@@ -127,12 +127,14 @@ void ofApp::draw(){
 
    //    Left image display -------------------------------------
 
-   if ( displaySketch ) {
+//   if ( displaySketch  ) {
 
         //workshop->sketchImg.update();
         //zoneA.drawImageInZone(workshop->sketchImg);
 
-    }else if (displayOriginal) {
+//    }else
+
+    if (displayOriginal) {
 
         zoneA.drawImageInZone(workshop->originalImgCrop);
 

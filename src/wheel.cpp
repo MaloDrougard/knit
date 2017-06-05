@@ -105,20 +105,34 @@ void abstractWheel::intializeThickLines()
     }
 
     for(int i = 0; i < pinsNumber; i ++ ){
-        for(int j = 0; j < pinsNumber; j++){
+        for(int j = 0; j <= i; j++){
 
             tempL = new list<int*>;
             thickLines[i][j] = tempL;
 
             if ( i != j){
 
-                drawer.setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(tempL, 200, 1, pins[i], pins[j]);
+                drawer.setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(tempL, 100, w-1 , h-1, pins[i], pins[j]);
 
             }
-
         }
 
     }
+
+    // make the symetrie only with the pointers to save memory
+    for(int i = 0; i < pinsNumber; i ++ ){
+        for(int j = i + 1; j < pinsNumber; j++){
+
+            thickLines[i][j] = thickLines[j][i];
+        }
+
+    }
+
+
+
+
+
+
 }
 
 
@@ -261,7 +275,7 @@ void abstractWheel::drawThickGridRepresentation()
         for(int j = 0; j < pinsNumber; j++){
 
             l = *(thickLines[i][j]);
-            drawer.increasePixelsWithIntensity(gridRepresentation, l);
+            drawer.decreasePixelsWithIntensity(gridRepresentation, l);
         }
     }
     gridRepresentation.update();

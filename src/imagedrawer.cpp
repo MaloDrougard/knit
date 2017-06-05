@@ -120,7 +120,7 @@ float imageDrawer::percentageOfPixeBelowLine(float localStartY, float deltaV )
 
     float localEndY = localStartY + deltaV;
 
-    if (factor > 1) {
+    if (factor > 1.002) {
         std::cerr << "lines with gradient higher than 45 degree should be turn" << std::cerr;
         throw -5;
     }
@@ -185,31 +185,47 @@ float imageDrawer::percentageOfPixeAboveLine(float localStartY, float deltaV)
     return (1 - percentageOfPixeBelowLine(localStartY, deltaV) );
 }
 
-void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(list<int *> *l, int maxIntensity, float width, ofVec2f l1, ofVec2f l2 )
+void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(list<int *> *l, int maxIntensity, int maxXPixelIdx, int maxYPixelIdx, ofVec2f l1, ofVec2f l2 )
 {
+    // draw a line of 3 pixel width with 60 percent of probabilty of the line at the center
 
-    // assume x0 to the left
-    // assume x1 - x0 > 0
-
-    int x0 = floor(l1.x);
-    int y0 = floor(l1.y);
-    int x1 = floor(l2.x);
-    int y1 = floor(l2.y);
+    float x0 = l1.x;
+    float y0 = l1.y;
+    float x1 = l2.x;
+    float y1 = l2.y;
 
 
-
-
-    if ( x0 == x1 && y0 == y1)
+    if ( floor(x0) == floor(x1) && floor(y0) == floor(y1) )
     {
         std::cerr << "Warning in imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLine: The line passed as argument is on one pixel" << std::endl;
     }
     else if ( abs(x1 - x0) >= abs(y1 -y0))
     {
-        this->setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranA(l, maxIntensity, x0, y0, x1, y1);
+
+        float deltaV =  (y1 - y0) / (x1 - x0);
+        float spaceBetweenTheBordersOfTheLineOnTheYAxis = sqrt(1 + pow(deltaV, 2)); // assuming width of 1
+
+
+        this->setPixelIdxAndIntensityBasedOnPercentageOf1PixelWidthLineCadranA(l, 0.2 * maxIntensity, maxXPixelIdx, maxYPixelIdx, x0, y0 + spaceBetweenTheBordersOfTheLineOnTheYAxis, x1, y1 + spaceBetweenTheBordersOfTheLineOnTheYAxis);
+        this->setPixelIdxAndIntensityBasedOnPercentageOf1PixelWidthLineCadranA(l, 0.6 * maxIntensity,  maxXPixelIdx, maxYPixelIdx, x0, y0, x1, y1);
+        this->setPixelIdxAndIntensityBasedOnPercentageOf1PixelWidthLineCadranA(l, 0.2 * maxIntensity,  maxXPixelIdx, maxYPixelIdx, x0, y0 - spaceBetweenTheBordersOfTheLineOnTheYAxis, x1, y1 -spaceBetweenTheBordersOfTheLineOnTheYAxis);
+
+
+
     }
     else if ( abs(x1 - x0) < abs(y1 -y0) )
     {
-        this->setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranB(l, maxIntensity, x0, y0, x1, y1);
+
+
+        float deltaH =   (x1 - x0)/(y1 - y0);
+        float spaceBetweenTheBordersOfTheLineOnTheXAxis = sqrt(1 + pow(deltaH, 2)); // assuming width of 1
+
+
+        this->setPixelIdxAndIntensityBasedOnPercentageOf1PixelWidthLineCadranB(l, 0.2 * maxIntensity,  maxXPixelIdx, maxYPixelIdx, x0 + spaceBetweenTheBordersOfTheLineOnTheXAxis, y0, x1 + spaceBetweenTheBordersOfTheLineOnTheXAxis, y1);
+        this->setPixelIdxAndIntensityBasedOnPercentageOf1PixelWidthLineCadranB(l, 0.6 * maxIntensity, maxXPixelIdx, maxYPixelIdx, x0, y0, x1, y1);
+        this->setPixelIdxAndIntensityBasedOnPercentageOf1PixelWidthLineCadranB(l, 0.2 * maxIntensity,  maxXPixelIdx, maxYPixelIdx, x0 - spaceBetweenTheBordersOfTheLineOnTheXAxis, y0, x1 - spaceBetweenTheBordersOfTheLineOnTheXAxis, y1);
+
+
     }
     else {
         std::cerr << "Error in imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLine: unexpected branche" << std::endl;
@@ -219,11 +235,11 @@ void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLine(list<int 
 
 }
 
-void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranA(list<int *> *l, int maxIntensity,  int x0, int y0, int x1, int y1)
+void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOf1PixelWidthLineCadranA(list<int *> *l, int maxIntensity,  int maxXPixelIdx, int maxYPixelIdx, float x0, float y0, float x1, float y1)
 {
 
 
-    int switchTemp;
+    float switchTemp;
 
     // make shure  the x0 is at the left
     if ( x1 <= x0){
@@ -237,12 +253,12 @@ void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranA(li
     }
 
 
-    int xPixelIndex = x0;
-    int yPixelIndex = y0;
+    int xPixelIndex = floor(x0);
+    int yPixelIndex = floor(y0);
 
 
 
-    float deltaV =  (float)(y1 - y0) / (float)(x1 - x0);
+    float deltaV =  (y1 - y0) / (x1 - x0);
     float spaceBetweenTheBordersOfTheLineOnTheYAxis = sqrt(1 + pow(deltaV, 2)); // assuming width of 1
 
 
@@ -252,8 +268,7 @@ void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranA(li
 
 
 
-    // we always start at the center of pixel indexes
-    float localYTopBorder = 0.5 * (-deltaV) + 0.5 + spaceBetweenTheBordersOfTheLineOnTheYAxis/2 ; // we are actually at pixel (x0, y0)
+    float localYTopBorder = (x0 - (float) xPixelIndex) * (-deltaV) + spaceBetweenTheBordersOfTheLineOnTheYAxis/2 ; // we are actually at pixel (xPixelIndex, yPixelIndex)
     float localYBottomBorder = localYTopBorder - spaceBetweenTheBordersOfTheLineOnTheYAxis;
 
 
@@ -270,6 +285,8 @@ void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranA(li
 
         int zeroPercentCounter = 0;
         int* xyi;
+
+        bool pixelAlreadyInLine = false;
 
         while  (xPixelIndex <= x1) {
 
@@ -288,14 +305,32 @@ void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranA(li
                 percent2 = percentageOfPixeAboveLine( localYBottomBorder, deltaV);
                 percent = 1 - (1 -percent1) - (1- percent2);
 
-                if (percent != 0 ){
+                if (percent != 0 && xPixelIndex <= maxXPixelIdx && yPixelIndex <= maxYPixelIdx && xPixelIndex > 0 && yPixelIndex > 0 ){
 
-                    xyi = new int[3];
-                    xyi[0] = xPixelIndex;
-                    xyi[1] = yPixelIndex;
-                    xyi[2] = floor(percent * maxIntensity);
 
-                    l->push_back(xyi);
+                    // check if we already have this pixel in the line
+                    pixelAlreadyInLine = false;
+                    for (std::list<int * >::iterator it = l->begin();(it != l->end()) && (pixelAlreadyInLine == false); it++){
+
+                        if( (*it)[0] == xPixelIndex && (*it)[1] == yPixelIndex ) {
+                           (*it)[2] += floor(percent * maxIntensity);
+                            pixelAlreadyInLine = true;
+                        }
+
+                    }
+                    // case where the pixel is not already in line
+                    if (! pixelAlreadyInLine){
+
+
+                        xyi = new int[3];
+                        xyi[0] = xPixelIndex;
+                        xyi[1] = yPixelIndex;
+                        xyi[2] = floor(percent * maxIntensity);
+                        l->push_back(xyi);
+                    }
+
+
+
 
 
                 } else {
@@ -329,6 +364,8 @@ void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranA(li
         int zeroPercentCounter = 0;
         int* xyi;
 
+        bool pixelAlreadyInLine = false;
+
         while  (xPixelIndex <= x1) {
 
             // initialize the loop
@@ -346,14 +383,28 @@ void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranA(li
                 percent2 = percentageOfPixeAboveLine( localYBottomBorder, deltaV);
                 percent = 1 - (1 -percent1) - (1- percent2);
 
-                if (percent != 0 ){
+                if (percent != 0 && xPixelIndex <= maxXPixelIdx && yPixelIndex <= maxYPixelIdx && xPixelIndex > 0 && yPixelIndex > 0 ){
 
-                    xyi = new int[3];
-                    xyi[0] = xPixelIndex;
-                    xyi[1] = yPixelIndex;
-                    xyi[2] = floor(percent * maxIntensity);
+                    // check if we already have this pixel in the line
+                    pixelAlreadyInLine = false;
+                    for (std::list<int * >::iterator it = l->begin(); (it != l->end()) && (pixelAlreadyInLine == false); it++){
 
-                    l->push_back(xyi);
+                        if( (*it)[0] == xPixelIndex && (*it)[1] == yPixelIndex ) {
+                           (*it)[2] += floor(percent * maxIntensity);
+                            pixelAlreadyInLine = true;
+                        }
+
+                    }
+                    // case where the pixel is not already in line
+                    if (! pixelAlreadyInLine){
+
+
+                        xyi = new int[3];
+                        xyi[0] = xPixelIndex;
+                        xyi[1] = yPixelIndex;
+                        xyi[2] = floor(percent * maxIntensity);
+                        l->push_back(xyi);
+                    }
 
 
                 } else {
@@ -380,12 +431,12 @@ void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranA(li
 
 }
 
-void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranB(list<int *> *l, int maxIntensity, int x0, int y0, int x1, int y1)
+void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOf1PixelWidthLineCadranB(list<int *> *l, int maxIntensity, int maxXPixelIdx, int maxYPixelIdx, float x0, float y0, float x1, float y1)
 {
 
 
     // switch of the coordinate
-    int switchTemp = x0;
+    float switchTemp = x0;
     x0 = y0;
     y0 = switchTemp;
     switchTemp = x1;
@@ -405,12 +456,12 @@ void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranB(li
 
 
 
-    int xPixelIndex = x0;
-    int yPixelIndex = y0;
+    int xPixelIndex = floor(x0);
+    int yPixelIndex = floor(y0);
 
 
 
-    float deltaV =  (float)(y1 - y0) / (float)(x1 - x0);
+    float deltaV =  (y1 - y0) / (x1 - x0);
     float spaceBetweenTheBordersOfTheLineOnTheYAxis = sqrt(1 + pow(deltaV, 2)); // assuming width of 1
 
 
@@ -421,12 +472,12 @@ void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranB(li
 
 
     // we always start at the center of pixel indexes
-    float localYTopBorder = 0.5 * (-deltaV) + 0.5 + spaceBetweenTheBordersOfTheLineOnTheYAxis/2 ; // we are actually at pixel (x0, y0)
+    float localYTopBorder = (x0 - (float) xPixelIndex ) * (-deltaV) + spaceBetweenTheBordersOfTheLineOnTheYAxis/2 ; // we are actually at pixel (x0, y0)
     float localYBottomBorder = localYTopBorder - spaceBetweenTheBordersOfTheLineOnTheYAxis;
 
 
 
-    float realYatX = y0 + localYTopBorder;  // the real Y mean the value of the top border of the line at the value of the xPixelIndex (not the center but the left side)
+    float realYatX = (float) y0 + localYTopBorder;  // the real Y mean the value of the top border of the line at the value of the xPixelIndex (not the center but the left side)
 
 
     if (deltaV <= 0 )
@@ -438,6 +489,9 @@ void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranB(li
 
         int zeroPercentCounter = 0;
         int* xyi;
+
+
+        bool pixelAlreadyInLine = false;
 
         while  (xPixelIndex <= x1) {
 
@@ -456,15 +510,28 @@ void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranB(li
                 percent2 = percentageOfPixeAboveLine( localYBottomBorder, deltaV);
                 percent = 1 - (1 -percent1) - (1- percent2);
 
-                if (percent != 0 ){
+                if (percent != 0 && xPixelIndex <= maxYPixelIdx && yPixelIndex <= maxXPixelIdx && xPixelIndex > 0 && yPixelIndex > 0  ){ // do not forgget we change the orientation of axises
 
-                    xyi = new int[3];
-                    xyi[1] = xPixelIndex;
-                    xyi[0] = yPixelIndex;
-                    xyi[2] = floor(percent * maxIntensity);
+                    // check if we already have this pixel in the line
+                    pixelAlreadyInLine = false;
+                    for (std::list<int * >::iterator it = l->begin(); (it != l->end()) && (pixelAlreadyInLine == false); it++){
 
-                    l->push_back(xyi);
+                        if( (*it)[1] == xPixelIndex && (*it)[0] == yPixelIndex ) {
+                           (*it)[2] += floor(percent * maxIntensity);
+                            pixelAlreadyInLine = true;
+                        }
 
+                    }
+                    // case where the pixel is not already in line
+                    if (! pixelAlreadyInLine){
+
+
+                        xyi = new int[3];
+                        xyi[1] = xPixelIndex;
+                        xyi[0] = yPixelIndex;
+                        xyi[2] = floor(percent * maxIntensity);
+                        l->push_back(xyi);
+                    }
 
                 } else {
                     zeroPercentCounter++;
@@ -497,6 +564,9 @@ void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranB(li
         int zeroPercentCounter = 0;
         int* xyi;
 
+
+        bool pixelAlreadyInLine = false;
+
         while  (xPixelIndex <= x1) {
 
             // initialize the loop
@@ -514,14 +584,28 @@ void imageDrawer::setPixelIdxAndIntensityBasedOnPercentageOfAThickLineCadranB(li
                 percent2 = percentageOfPixeAboveLine( localYBottomBorder, deltaV);
                 percent = 1 - (1 -percent1) - (1- percent2);
 
-                if (percent != 0 ){
+                if (percent != 0 && xPixelIndex <= maxYPixelIdx && yPixelIndex <= maxXPixelIdx && xPixelIndex > 0 && yPixelIndex > 0){ // do not forgget we change the orientation of axises
 
-                    xyi = new int[3];
-                    xyi[1] = xPixelIndex;
-                    xyi[0] = yPixelIndex;
-                    xyi[2] = floor(percent * maxIntensity);
+                    // check if we already have this pixel in the line
+                    pixelAlreadyInLine = false;
+                    for (std::list<int * >::iterator it = l->begin(); (it != l->end()) && (pixelAlreadyInLine == false); it++){
 
-                    l->push_back(xyi);
+                        if( (*it)[1] == xPixelIndex && (*it)[0] == yPixelIndex ) {
+                           (*it)[2] += floor(percent * maxIntensity);
+                            pixelAlreadyInLine = true;
+                        }
+
+                    }
+                    // case where the pixel is not already in line
+                    if (!pixelAlreadyInLine){
+
+
+                        xyi = new int[3];
+                        xyi[1] = xPixelIndex;
+                        xyi[0] = yPixelIndex;
+                        xyi[2] = floor(percent * maxIntensity);
+                        l->push_back(xyi);
+                    }
 
 
                 } else {
@@ -552,9 +636,11 @@ void imageDrawer::drawPixelsWithIntensity(ofImage &img, list<int *> l)
 {
 
     ofColor color;
+    int value;
     for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++){
 
-        color = ofColor( (*it)[2], (*it)[2] , (*it)[2] );
+        value = 255 - (*it)[2];
+        color = ofColor( value, value, value );
         img.setColor((*it)[0],  (*it)[1], color);
     }
 
@@ -582,6 +668,30 @@ void imageDrawer::increasePixelsWithIntensity(ofImage &img, list<int *> l)
     }
 
     img.update();
+}
+
+void imageDrawer::decreasePixelsWithIntensity(ofImage &img, list<int *> l)
+{
+    ofColor color;
+    ofColor oldColor;
+    int value;
+    int xIdx;
+    int yIdx;
+
+    for (std::list<int * >::iterator it = l.begin(); it != l.end(); it++){
+
+        value = (*it)[2];
+        color = ofColor( value, value, value );
+        xIdx = (*it)[0];
+        yIdx = (*it)[1];
+
+        oldColor = img.getColor(xIdx, yIdx);
+        img.setColor(xIdx,  yIdx, oldColor - color);
+
+      }
+
+    img.update();
+
 }
 
 
