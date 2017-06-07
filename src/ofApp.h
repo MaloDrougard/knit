@@ -61,6 +61,8 @@ public:
 
 
 
+
+
     zone zoneA;
     zone zoneB;
 
@@ -69,8 +71,7 @@ public:
 
 
     void setup();
-    void setup1();
-    void setup2();
+    void setupSecondePart();
     void update();
     void draw();
 
@@ -118,4 +119,5 @@ public:
     void draw1();
     void draw2();
     void onTypeOfShedValidatedPressed();
+
 };
