@@ -76,20 +76,31 @@ void abstractWheel::initializeLines(){
     }
 
     for(int i = 0; i < pinsNumber; i ++ ){
-        for(int j = 0; j < pinsNumber; j++){
+        for(int j = 0; j <= i; j++){
 
             tempL = new list<int*>;
             lines[i][j] = tempL;
 
             if ( i != j){
-
                 drawer.getPixelIdxOfALineDDAAlgo(tempL, pins[i], pins[j]);
-
             }
-
         }
 
     }
+
+    // make the symetrie only with the pointers to save memory
+    for(int i = 0; i < pinsNumber; i ++ ){
+        for(int j = i + 1; j < pinsNumber; j++){
+
+            lines[i][j] = lines[j][i];
+        }
+
+    }
+
+
+
+
+
 }
 
 void abstractWheel::intializeThickLines()

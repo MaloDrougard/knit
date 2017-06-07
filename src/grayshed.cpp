@@ -43,7 +43,7 @@ void grayShed::initializeMask()
 
     for (int x = 0; x < w; x++){
         for(int y = 0; y < h; y++){
-            mask[x][y] = 1;
+            mask[x][y] = 0;
         }
     }
 
@@ -84,7 +84,7 @@ void grayShed::computeBrushedImg()
 
     for( int x = 0 ; x < brushedImg.getWidth(); x++ ){
         for ( int y = 0; y < brushedImg.getHeight(); y++ ){
-            if (mask[x][y] != 1) {
+            if (mask[x][y] != 0) {
                brushedImg.setColor(x,y, color);
             }
 
@@ -126,7 +126,7 @@ void grayShed::drawWithBrushOnMask( int x, int y ,float ** brushType, int sizeBr
             tempIdxX = x - middle + i;
             tempIdxY = y - middle + j;
             if  (!( (tempIdxX < 0) or (tempIdxX > w -1 ) or (tempIdxY < 0 ) or (tempIdxY > h -1 ) ) ) { // border case of the brush
-                mask[tempIdxX][tempIdxY] *= brushType[i][j];
+                mask[tempIdxX][tempIdxY] = brushType[i][j];
             }
          }
 
@@ -135,12 +135,6 @@ void grayShed::drawWithBrushOnMask( int x, int y ,float ** brushType, int sizeBr
 
 
 }
-
-
-
-
-
-
 
 
 
@@ -401,7 +395,7 @@ int grayShed::findNextBestPin(int pinIdx){
 
     for( int i = 0; i < wel.pinsNumber; i++){
         tempIdx = ( i + pinIdx) % wel.pinsNumber;
-        tempScore = (this->*pScoreFunctionInUse)(*(wel.thickLines[pinIdx][tempIdx]));
+        tempScore = (this->*pScoreFunctionInUse)(*(wel.lines[pinIdx][tempIdx]));
 
 
         if (tempScore > bestScore){
@@ -455,10 +449,10 @@ void grayShed::computeAndDrawOneStep()
         nextPinIdx1 = findNextBestPin(currentPinIdx1);
 
         // increase the value of the pixel that are under the line in sketch image (in case we use this lineScore function)
-        drawer.increasePixels(sketchImg, *(wel.thickLines[currentPinIdx1][nextPinIdx1]), ofColor(algoOpacityP, algoOpacityP, algoOpacityP));
+        drawer.increasePixels(sketchImg, *(wel.lines[currentPinIdx1][nextPinIdx1]), ofColor(algoOpacityP, algoOpacityP, algoOpacityP));
 
         // draw the line on result
-        drawer.decreasePixels(result, *(wel.thickLines[currentPinIdx1][nextPinIdx1]), ofColor(drawOpacityP,drawOpacityP,drawOpacityP));
+        drawer.decreasePixels(result, *(wel.lines[currentPinIdx1][nextPinIdx1]), ofColor(drawOpacityP,drawOpacityP,drawOpacityP));
 
         std::cout << "step: " << currentPinIdx1 << ":" << nextPinIdx1 << std::endl;
 

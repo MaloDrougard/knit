@@ -21,13 +21,19 @@
 class ofApp : public ofBaseApp{
 
 public:
+    ofxPanel guiStart;
 
+    ofParameter<int> typeOfShed;
+    ofxButton typeOfShedValidatedBtn;
+    bool typeOfShedValidated;
+    
     ofParameterGroup allParameters;
     ofParameter<bool> oneRandom ;
     ofParameter<bool> stopAlgo;
     ofxButton startBtn;
     ofxButton launchScript;
 
+    
 
 
     ofParameterGroup leftImgParameters;
@@ -62,8 +68,9 @@ public:
     int brushSize ;
 
 
-
     void setup();
+    void setup1();
+    void setup2();
     void update();
     void draw();
 
@@ -104,7 +111,11 @@ public:
 
     abstractWheel * wel;
 
+    bool gridIsValidated;
 
     void gridValidation();
 
+    void draw1();
+    void draw2();
+    void onTypeOfShedValidatedPressed();
 };

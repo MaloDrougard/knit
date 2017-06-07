@@ -2,16 +2,63 @@
 #include "ofApp.h"
 
 //--------------------------------------------------------------
+
 void ofApp::setup(){
 
+    // Type of shed setup
+    typeOfShedValidated = false;
+    guiStart.setup();
+    guiStart.setSize(300,40);
+    guiStart.add(typeOfShed.set("gray, additiveColor, substractiveColor", 1,1,3));
+    guiStart.add(typeOfShedValidatedBtn.setup("validate you type of shed"));
+    typeOfShedValidatedBtn.addListener(this, &ofApp::onTypeOfShedValidatedPressed);
 
+
+    // Grid setup
+    gridIsValidated = false;
+    int guiGridWidth = 300;
+    guiGrid.setup();
+    guiGrid.setSize(guiGridWidth, 100);
+    guiGrid.setName("Grid parameters");
+    guiGrid.add(numberOfPins.set("#pins", 120, 4, 720));
+    guiGrid.add(typeWheelInfo.setup("", "1=circle,2=square,3=tribal,4=extra,5=file"));
+    typeWheelInfo.setSize(guiGridWidth, typeWheelInfo.getHeight());
+    guiGrid.add(typeOfWheel.set("type of grid",1,1,5));
+    guiGrid.add(randomifySlightlyPinPositions.set("randomify slightly pin positions", true));
+    guiGrid.add(gridValidationBtn.setup("Validtate grid"));
+    gridValidationBtn.addListener(this, &ofApp::gridValidation);
+    guiGrid.setPosition(260, 20);
+    wel = NULL;
+
+
+
+}
+
+void ofApp::onTypeOfShedValidatedPressed(){
+
+
+    if (typeOfShed == 1){
+        this->setup1();
+    }
+    else if (typeOfShed == 2){
+        this->setup2();
+    }else if (typeOfShed == 3){
+        this->setup2();
+    }
+
+    typeOfShedValidated = true;
+
+}
+
+
+void ofApp::setup1(){
 
     saveOption = false;
     extraPins =  std::list<ofVec2f> ();
 
 
     outputFolder = "/home/makem/Cours/knitProject/outputPics/";
-    imageFn = "white820x820";
+    imageFn = "elgreco1";
     pic.load("/home/makem/Cours/knitProject/inputPics/" + imageFn + ".jpg");
     pic.setImageType(OF_IMAGE_COLOR);
 
@@ -39,10 +86,10 @@ void ofApp::setup(){
     leftImgParameters.setName("Left image interface");
     leftImgParameters.add(displayOriginal.set("Display original image", false));
     leftImgParameters.add(displayGrid.set("Display grid", false));
+    leftImgParameters.add(brushingMode.set("Brushing Mode", false));
+    leftImgParameters.add(pinsSettingsMode.set("Pins setting mode", false));
     guiLeftImg.setup(leftImgParameters);
     guiLeftImg.add(saveImagesBtn.setup("Save Images"));
-
-
 
 
     zoneA = zone();
@@ -69,7 +116,7 @@ void ofApp::setup(){
     guiGrid.setup();
     guiGrid.setSize(guiGridWidth, 100);
     guiGrid.setName("Grid parameters");
-    guiGrid.add(numberOfPins.set("#pins", 64, 4, 720));
+    guiGrid.add(numberOfPins.set("#pins", 120, 4, 720));
     guiGrid.add(typeWheelInfo.setup("", "1=circle,2=square,3=tribal,4=extra,5=file"));
     typeWheelInfo.setSize(guiGridWidth, typeWheelInfo.getHeight());
     guiGrid.add(typeOfWheel.set("type of grid",1,1,5));
@@ -85,10 +132,67 @@ void ofApp::setup(){
     oneRandom = false;
     stopAlgo = true;
 
+    setupBrush();
+}
 
-    test tester = test();
-    tester.imageDrawerPercent();
-    tester.setPixelIdxAndIntensityBasedOnPercentageOfAThickLine();
+void ofApp::setup2()
+{
+    
+        saveOption = false;
+        extraPins =  std::list<ofVec2f> ();
+    
+        outputFolder = "/home/makem/Cours/knitProject/outputPics/";
+        imageFn = "elgreco1";
+        pic.load("/home/makem/Cours/knitProject/inputPics/" + imageFn + ".jpg");
+        pic.setImageType(OF_IMAGE_COLOR);
+    
+    
+        pinPositionsSaverFn = outputFolder + "pinPositions.dat";
+        pinPositionsInputFn = outputFolder + "inputPinPositions.dat";
+    
+        workshop = new colorShed(pic, imageFn);
+    
+        numberOfCall = 0;
+        computeGridNeeded = true;
+    
+        allParameters.setName("Parameters"); 
+    
+        allParameters.add(workshop->globalP);
+        allParameters.add(workshop->inFlyP);
+        allParameters.add(workshop->infoP);
+    
+    
+        guiAlgo.setup(allParameters);
+        guiAlgo.add(startBtn.setup("Start"));
+        guiAlgo.add(launchScript.setup("Lauch background script"));
+    
+    
+        leftImgParameters.setName("Left image interface");
+        leftImgParameters.add(displayOriginal.set("Display original image", false));
+        leftImgParameters.add(displayGrid.set("Display grid", false));
+        guiLeftImg.setup(leftImgParameters);
+        guiLeftImg.add(saveImagesBtn.setup("Save Images"));
+    
+    
+    
+    
+        zoneA = zone();
+        zoneA.setup(workshop->w, workshop->h, 20, 20 );
+    
+        zoneB = zone();
+        zoneB.setup(workshop->w, workshop->h, workshop->w + 40 , 20 );
+    
+        guiAlgo.setPosition(workshop->w + 30, 10);
+    
+
+        saveImagesBtn.addListener(this, &ofApp::onSaveImagesPressed);
+        startBtn.addListener(this, &ofApp::onStartPressed );
+        launchScript.addListener(this, &ofApp::runScript );
+
+        stopAlgo = true;
+
+        setupBrush();
+
 }
 
 
@@ -100,11 +204,12 @@ void ofApp::update(){
 
 }
 
-//--------------------------------------------------------------
-void ofApp::draw(){
+
+void ofApp::draw2(){
+
 
     // workshop->checkchange();WeilghByMaskFactor
-    
+
     // std::cout << "call to drawOne number: " <<  numberOfCall << std::endl;
 
 
@@ -142,7 +247,7 @@ void ofApp::draw(){
 
 
        if (computeGridNeeded){
-           wel->drawThickGridRepresentation();
+           wel->drawGridRepresentation();
            computeGridNeeded = false;
         }
 
@@ -150,14 +255,19 @@ void ofApp::draw(){
 
     }else if (brushingMode){
 
-//        workshop->computeBrushedImg();
-//        zoneA.drawImageInZone(workshop->brushedImg);
+        if( workshop->type == "grayShed") {
+            ((grayShed*)workshop)->computeBrushedImg();
+            zoneA.drawImageInZone( ((grayShed*) workshop)->brushedImg);
+
+        }else{
+            std::cerr << "Warrning::only gray shed allow brushing mode" << std::endl;
+        }
 
     }
    else if (pinsSettingsMode){
 
- //      wel->drawPins();
- //      zoneA.drawImageInZone(wel->pinsRepresentation);
+         wel->drawPins();
+         zoneA.drawImageInZone(wel->pinsRepresentation);
 
    }
 
@@ -182,6 +292,112 @@ void ofApp::draw(){
 
 
 }
+
+
+//--------------------------------------------------------------
+
+
+void ofApp::draw(){
+
+    if( (!typeOfShedValidated) || (!gridIsValidated) ){
+        guiStart.draw();
+        guiGrid.draw();
+
+    }else if ( typeOfShed == 1){
+        this->draw1();
+    }else {
+        draw2();
+    }
+
+ }
+
+void ofApp::draw1(){
+
+    // workshop->checkchange();WeilghByMaskFactor
+
+    // std::cout << "call to drawOne number: " <<  numberOfCall << std::endl;
+
+
+
+
+    //  Algo and right image display -------------------------------------
+
+    if(oneRandom && !stopAlgo)
+    {
+       // workshop->randomifyNextPinAndDrawOneString();
+    }
+    else if (! stopAlgo)
+    {
+        workshop->computeAndDrawOneStep();
+    }
+
+    zoneB.drawImageInZone(workshop->result);
+
+
+
+   //    Left image display -------------------------------------
+
+//   if ( displaySketch  ) {
+
+        //workshop->sketchImg.update();
+        //zoneA.drawImageInZone(workshop->sketchImg);
+
+//    }else
+
+    if (displayOriginal) {
+
+        zoneA.drawImageInZone(workshop->originalImgCrop);
+
+    }else if (displayGrid){
+
+
+       if (computeGridNeeded){
+           wel->drawGridRepresentation();
+           computeGridNeeded = false;
+        }
+
+        zoneA.drawImageInZone(wel->gridRepresentation);
+
+    }else if (brushingMode){
+
+        if( workshop->type == "grayShed") {
+            ((grayShed*)workshop)->computeBrushedImg();
+            zoneA.drawImageInZone( ((grayShed*) workshop)->brushedImg);
+
+        }else{
+            std::cerr << "Warrning::only gray shed allow brushing mode" << std::endl;
+        }
+
+    }
+   else if (pinsSettingsMode){
+
+         wel->drawPins();
+         zoneA.drawImageInZone(wel->pinsRepresentation);
+
+   }
+
+
+    if ((numberOfCall %100 )== 0){ // not clean
+        workshop->computeLightnessAbsoluteError();
+    }
+
+    if (((workshop->stepsNumberP % 1000 ) == 1) and saveOption ){
+
+        this->onSaveImagesPressed();
+
+    }
+
+
+
+    guiAlgo.draw();
+    guiLeftImg.draw();
+
+
+    numberOfCall++;
+
+
+}
+
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
@@ -245,7 +461,10 @@ void ofApp::onMouseInZoneA( ofVec2f & relPos){
 
     if ( brushingMode){
         std::cout << "mouseDraggesInZoneA "<< relPos[0] << ":"<< relPos[1] << std::endl;
-        //workshop->drawWithBrushOnMask( relPos[0] , relPos[1] , brush, brushSize);
+        if (workshop->type == "grayShed"){
+           ((grayShed*) workshop)->drawWithBrushOnMask( relPos[0] , relPos[1] , brush, brushSize);
+        }
+
     }
     else if( pinsSettingsMode)
     {
@@ -259,6 +478,21 @@ void ofApp::onMouseInZoneA( ofVec2f & relPos){
 
 
 
+void ofApp::setupBrush()
+{
+    brushSize = 13;
+    brush = new float * [brushSize];
+    for (int i = 0; i < brushSize; i++ ){
+        brush[i] = new float [brushSize];
+    }
+
+    for (int j = 0; j < brushSize; j++ ){
+        for (int h = 0; h < brushSize; h++ ){
+            brush[j][h] = 6;
+        }
+    }
+}
+
 
 
 
@@ -268,13 +502,16 @@ void ofApp::onSaveImagesPressed()
 
 
     if (computeGridNeeded){
-         wel->drawThickGridRepresentation();
+         wel->drawGridRepresentation();
          computeGridNeeded = false;
      }
 
+
+    wel->drawPins();
+    wel->pinsRepresentation.save(outputFolder + "pins.jpg");
+
     wel->gridRepresentation.save(outputFolder + "grid.jpg" );
     workshop->saveResultImage(outputFolder);
-
 
 
 }
@@ -334,10 +571,10 @@ void ofApp::gridValidation()
         this->wel->writePinPositionsToFile(pinPositionsSaverFn);
 
 
-        this->wel->intializeThickLines();
+        this->wel->initializeLines();
         computeGridNeeded = True;
 
-      ;
+        gridIsValidated = true;
 
 
 

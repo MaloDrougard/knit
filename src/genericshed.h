@@ -50,6 +50,7 @@ public:
 
     int computeLightnessAbsoluteError();// differance between the result and the original (counting the lightness differance)
 
+
 };
 
 #endif // GENERICSHED_H
