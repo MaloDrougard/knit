@@ -19,13 +19,15 @@ public:
     ofParameter<int> scoreFuntionToUse;
 
 
+   int initialMaskFactor;
+
+
     int currentPinIdx1; // used in computeNextPinAndDrawOneString()
     int nextPinIdx1; // used in computeNextPinAndDrawOneString()
 
-
     void setSketch();
     void setBrushedImg();
-    void initializeMask();
+    void initializeMask(int initValue);
     void setupGrayOfParameters(); // set the parameters relativily to this shed
 
 

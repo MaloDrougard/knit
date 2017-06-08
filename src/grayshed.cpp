@@ -12,7 +12,8 @@ grayShed::grayShed(ofImage oriImg, string imageName) : genericShed(oriImg, image
     // initialize the sketch image who is use to perform the computation
     setSketch();
     setBrushedImg();
-    initializeMask();
+    initialMaskFactor = 0;
+    initializeMask(initialMaskFactor);
 
     currentPinIdx1 = 0;
     nextPinIdx1 = -1;
@@ -32,9 +33,10 @@ void grayShed::setBrushedImg()
     brushedImg.update();
 }
 
-void grayShed::initializeMask()
+void grayShed::initializeMask(int initValue)
 {
 
+    initialMaskFactor = initValue;
     mask = new float * [w];
 
     for (int i = 0 ; i < w; i++){
@@ -43,7 +45,7 @@ void grayShed::initializeMask()
 
     for (int x = 0; x < w; x++){
         for(int y = 0; y < h; y++){
-            mask[x][y] = 0;
+            mask[x][y] = initialMaskFactor;
         }
     }
 
@@ -54,7 +56,7 @@ void grayShed::setupGrayOfParameters()
 
 
     globalP.setName("Global Algorithm Parameters");
-    globalP.add(maxStepsNumberP.set("max #steps", 100003, -1, 40000) );
+    globalP.add(maxStepsNumberP.set("max #steps", 20000, -1, 40000) );
     inFlyP.setName("In Fly Parameters");
     inFlyP.add(scoreFuntionToUse.set("ScoreFunction",4,1,7));
     inFlyP.add(drawOpacityP.set("Draw Opacity", 9, 0, 255));
@@ -84,7 +86,7 @@ void grayShed::computeBrushedImg()
 
     for( int x = 0 ; x < brushedImg.getWidth(); x++ ){
         for ( int y = 0; y < brushedImg.getHeight(); y++ ){
-            if (mask[x][y] != 0) {
+            if (mask[x][y] != initialMaskFactor) {
                brushedImg.setColor(x,y, color);
             }
 

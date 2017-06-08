@@ -57,6 +57,12 @@ public:
     ofxPanel guiAlgo;
     ofxPanel guiLeftImg;
 
+    ofxPanel guiBrush;
+    ofParameter<int> initialMaskFactorValue;
+    ofxButton initializeMaskBtn;
+    ofParameter<int> brushValue;
+    ofxButton initializeBrushBtn;
+
 
 
 
@@ -88,6 +94,7 @@ public:
     void gotMessage(ofMessage msg);
 
     void setupBrush();
+    void initializeMask(); // initialize mask for gray shed
     void onMouseInZoneA(ofVec2f &relPos);
     void onStartPressed();
 

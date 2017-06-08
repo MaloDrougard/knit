@@ -8,8 +8,8 @@ void ofApp::setup(){
     // one before the type of shed is know and one after
 
     //File
-    outputFolder = "/home/makem/Cours/knitProject/outputPics/";
-    imageFn = "jaques2";
+    outputFolder = "/home/makem/Cours/knitProject/outputPics/tmp/";
+    imageFn = "disco-soupe";
     pic.load("/home/makem/Cours/knitProject/inputPics/" + imageFn + ".jpg");
     pic.setImageType(OF_IMAGE_COLOR);
 
@@ -104,7 +104,7 @@ void ofApp::setupSecondePart(){
     guiGrid.setup();
     guiGrid.setSize(guiGridWidth, 100);
     guiGrid.setName("Grid parameters");
-    guiGrid.add(numberOfPins.set("#pins", 64, 4, 720));
+    guiGrid.add(numberOfPins.set("#pins", 240, 4, 720));
     guiGrid.add(typeWheelInfo.setup("", "1:circle,2:square,3:tribal,4:extra,5:file"));
     typeWheelInfo.setSize(guiGridWidth, typeWheelInfo.getHeight());
     guiGrid.add(typeOfWheel.set("type of grid",1,1,5));
@@ -113,9 +113,18 @@ void ofApp::setupSecondePart(){
 
     gridValidationBtn.addListener(this, &ofApp::gridValidation);
 
-    guiGrid.setPosition(30, workshop->h - 100);
+    guiGrid.setPosition(10, workshop->h - 100);
 
 
+    guiBrush.setup();
+    guiBrush.setName("Brushing mode parameters");
+    guiBrush.add(initialMaskFactorValue.set("Initial mask value", 0,-20,40));
+    guiBrush.add(initializeMaskBtn.setup("ReInitialize mask"));
+    guiBrush.add(brushValue.set("Brush value",6,-20,40));
+    guiBrush.add(initializeBrushBtn.setup("Reinitialize brush"));
+    initializeBrushBtn.addListener(this, &ofApp::setupBrush);
+    initializeMaskBtn.addListener(this, &ofApp::initializeMask);
+    guiBrush.setPosition(10,200);
 
     wel = NULL;
 
@@ -141,7 +150,6 @@ void ofApp::draw(){
         guiStart.draw();
     }
     else if(! gridIsValidated){
-
        if (displayOriginal) {
             zoneA.drawImageInZone(workshop->originalImgCrop);
        }else if (pinsSettingsMode){
@@ -203,6 +211,7 @@ void ofApp::draw1(){
         if( workshop->type == "grayShed") {
             ((grayShed*)workshop)->computeBrushedImg();
             zoneA.drawImageInZone( ((grayShed*) workshop)->brushedImg);
+            guiBrush.draw();
 
         }else{
             std::cerr << "Warrning::only gray shed allow brushing mode" << std::endl;
@@ -335,8 +344,18 @@ void ofApp::setupBrush()
 
     for (int j = 0; j < brushSize; j++ ){
         for (int h = 0; h < brushSize; h++ ){
-            brush[j][h] = 6;
+            brush[j][h] = brushValue;
         }
+    }
+}
+
+void ofApp::initializeMask()
+{
+
+    if( workshop->type == "grayShed") {
+        ((grayShed*)workshop)->initializeMask(initialMaskFactorValue);
+    }else{
+        std::cerr << "Warrning::only gray shed allow brushing mode" << std::endl;
     }
 }
 
