@@ -161,7 +161,7 @@ void abstractWheel::destroyLines(){
 
     for( int x = 0; x < pinsNumber; x++)
     {
-        for( int y= 0; y < pinsNumber; y++){
+        for( int y= x; y < pinsNumber; y++){ // rember we had some optimization and we have a triangle matrix
             tempL = lines[x][y];
             drawer.freeListOfIntArray(tempL);
             delete tempL;

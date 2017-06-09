@@ -8,8 +8,8 @@ void ofApp::setup(){
     // one before the type of shed is know and one after
 
     //File
-    outputFolder = "/home/makem/Cours/knitProject/outputPics/tmp/";
-    imageFn = "disco-soupe";
+    outputFolder = "/home/makem/Cours/knitProject/outputPics/";
+    imageFn = "bat1";                                               // but the input file name here!
     pic.load("/home/makem/Cours/knitProject/inputPics/" + imageFn + ".jpg");
     pic.setImageType(OF_IMAGE_COLOR);
 
@@ -47,7 +47,7 @@ void ofApp::onTypeOfShedValidatedPressed(){
 
 void ofApp::setupSecondePart(){
 
-    saveOption = false;
+    saveOption = true;  // if true -> save at each 1000 steps the result image into the output dir
     extraPins =  std::list<ofVec2f> ();
 
     pinPositionsSaverFn = outputFolder + "pinPositions.dat";
