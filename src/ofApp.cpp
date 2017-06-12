@@ -8,8 +8,8 @@ void ofApp::setup(){
     // one before the type of shed is know and one after
 
     //File
-    outputFolder = "/home/makem/Cours/knitProject/outputPics/";
-    imageFn = "bat1";                                               // but the input file name here!
+    outputFolder = "/home/makem/Cours/knitProject/outputPics/spider/";
+    imageFn = "starik2";                                               // but the input file name here!
     pic.load("/home/makem/Cours/knitProject/inputPics/" + imageFn + ".jpg");
     pic.setImageType(OF_IMAGE_COLOR);
 
@@ -315,9 +315,12 @@ void ofApp::onMouseInZoneA( ofVec2f & relPos){
     }
     else if( pinsSettingsMode)
     {
-          std::cout << "mousePressInZoneA "<< relPos[0] << ":"<< relPos[1] << std::endl;
-          extraPins.push_front(ofVec2f(relPos[0], relPos[1]));
+          if ( rand() % 10 == 0 ) // to do not overcharge the grid
+          {
+              std::cout << "mouseDragInZoneA "<< relPos[0] << ":"<< relPos[1] << std::endl;
+              extraPins.push_front(ofVec2f(relPos[0], relPos[1]));
 
+          }
     }
 
 }
