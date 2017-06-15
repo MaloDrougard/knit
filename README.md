@@ -18,6 +18,14 @@ This program is free software: you can redistribute it and/or modify it under th
 
 ![alt text](https://github.com/MaloDrougard/knit/blob/master/Doc/oiseau.jpg)
 
+![alt text](https://github.com/MaloDrougard/knit/blob/master/Doc/in-oiseau.jpg)
+
+![alt text](https://github.com/MaloDrougard/knit/blob/master/Doc/si_starik1-ss_12001-st_grayShed-so_9-se_31682460-wt_square-wp_240.jpg)
+
+![alt text](https://github.com/MaloDrougard/knit/blob/master/Doc/starik1.jpg)
+
+
+![alt text](https://github.com/MaloDrougard/knit/blob/master/Doc/capture-brushing-mode.png)
 
 
 
