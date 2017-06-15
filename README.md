@@ -10,6 +10,9 @@ You can find the report of the project here: https://github.com/MaloDrougard/kni
 ## Installation
 This project use the openframwork library. You need first to install openframwork and then install this app into root_of/apps/myApps/knit/
 
+## Contact
+You can contact me at: malcommalo.drougard@epfl.ch
+
 ## License 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
 
