@@ -17,18 +17,23 @@ This program is free software: you can redistribute it and/or modify it under th
 ## Images
 
 ![alt text](https://github.com/MaloDrougard/knit/blob/master/Doc/oiseau.jpg)
-Image produced using three thread of colors with the image bellow as input images 
+
+Color extension example
 
 ![alt text](https://github.com/MaloDrougard/knit/blob/master/Doc/in-oiseau.jpg)
+
 Input image for the color example
 
 ![alt text](https://github.com/MaloDrougard/knit/blob/master/Doc/si_starik1-ss_12001-st_grayShed-so_9-se_31682460-wt_square-wp_240.jpg)
-Image produced with eyes area selected
+
+Eyes area selection
 
 ![alt text](https://github.com/MaloDrougard/knit/blob/master/Doc/starik1.jpg)
-Input image
+
+Input image for the eyes area selection
 
 ![alt text](https://github.com/MaloDrougard/knit/blob/master/Doc/capture-brushing-mode.png)
+
 User interface during the selection of the eyes area
 
 
