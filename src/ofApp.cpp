@@ -432,7 +432,7 @@ void ofApp::gridValidation()
 
 
         this->wel->initializeLines();
-        computeGridNeeded = True;
+        computeGridNeeded = true;
 
 
 
