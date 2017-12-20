@@ -9,6 +9,9 @@ You can find the report of the project here: https://github.com/MaloDrougard/kni
 
 ## Installation
 This project use the openframwork library. You need first to install openframwork and then install this app into root_of/apps/myApps/knit/
+You can follow the wiki: 
+https://github.com/MaloDrougard/knit/wiki/Installation-of-openframework-qtcreator-knitApp
+
 
 ## Contact
 You can contact me at: malcommalo.drougard@epfl.ch
