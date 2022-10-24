@@ -83,13 +83,13 @@ void zone::mouseExited(ofMouseEventArgs & args){}
 
 //this function checks if the passed arguments are inside the zone.
 bool zone::inside(int x, int y ){
-    bool ret = False;
+    bool ret = false;
 
     relativeX = x - startPosX;
     relativeY = y - startPosY;
 
     if (( relativeX < w ) and ( relativeX >= 0 ) and (relativeY < h) and (relativeY >= 0 ) ){
-        ret = True;
+        ret = true;
     }
 
     return ret ;

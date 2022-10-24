@@ -8,9 +8,9 @@ void ofApp::setup(){
     // one before the type of shed is know and one after
 
     //File
-    outputFolder = "/home/makem/Cours/knitProject/outputPics/spider/";
-    imageFn = "starik2";                                               // but the input file name here!
-    pic.load("/home/makem/Cours/knitProject/inputPics/" + imageFn + ".jpg");
+    outputFolder = "/home/makem/Download";
+    imageFn = "test";                                               // but the input file name here!
+    pic.load("/home/makem/Shared/Insta/" + imageFn + ".jpg");
     pic.setImageType(OF_IMAGE_COLOR);
 
 

@@ -23,13 +23,13 @@ grayShed::grayShed(ofImage oriImg, string imageName) : genericShed(oriImg, image
 
 void grayShed::setSketch()
 {
-    sketchImg.clone(originalImgCrop);
+    sketchImg = ofImage(originalImgCrop);
     sketchImg.update();
 }
 
 void grayShed::setBrushedImg()
 {
-    brushedImg.clone(originalImgCrop);
+    brushedImg = ofImage(originalImgCrop);
     brushedImg.update();
 }
 

@@ -121,7 +121,7 @@ float imageDrawer::percentageOfPixeBelowLine(float localStartY, float deltaV )
     float localEndY = localStartY + deltaV;
 
     if (factor > 1.002) {
-        std::cerr << "lines with gradient higher than 45 degree should be turn" << std::cerr;
+        std::cerr << "lines with gradient higher than 45 degree should be turn" << std::endl;
         throw -5;
     }
 

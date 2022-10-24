@@ -506,7 +506,7 @@ wheelCircle::wheelCircle( int pinsNumber, int w, int h)
 
  void wheelFromPolyLine::generatePins()
  {
-    std::vector<ofPoint> veritces = this->polyline.getVertices();
+    auto veritces = this->polyline.getVertices();
     int i = 0;
     for(auto it = veritces.begin(); it != veritces.end(); ++it) {
 
@@ -526,11 +526,11 @@ wheelCircle::wheelCircle( int pinsNumber, int w, int h)
      this->w = w;
      this->h = w;
 
-     polyline.addVertex(ofVec2f(0,0));
-     polyline.lineTo(ofVec2f((w -1),0));
-     polyline.lineTo(ofVec2f((w-1),(h-1)));
-     polyline.lineTo(ofVec2f(0,(h-1)));
-     polyline.lineTo(ofVec2f(0,0));
+     polyline.addVertex(0,0);
+     polyline.lineTo(w -1,0);
+     polyline.lineTo(w-1,h-1);
+     polyline.lineTo(0,h-1);
+     polyline.lineTo(0,0);
 
      polyline = polyline.getResampledByCount(pinsNumber);     // force the polyline to have the correct number of points
 

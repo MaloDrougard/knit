@@ -46,7 +46,7 @@ void genericShed::setOriginalImgCrop()
     int oriW = originalImg.getWidth();
     int oriH = originalImg.getHeight();
 
-    originalImgCrop.clone(originalImg);
+    originalImgCrop = ofImage(originalImg);
 
     int diff = 0;
     if( oriW > oriH ){
